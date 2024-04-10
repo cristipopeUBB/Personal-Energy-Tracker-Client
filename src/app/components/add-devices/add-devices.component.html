@@ -1,0 +1,76 @@
+<div class="container">
+    <div class="navigation">
+        <ul>
+            <li>
+                <a href="#">
+                    <span class="icon"><i class="fa fa-lightbulb-o" aria-hidden="true"></i></span>
+                    <span class="title font-weight-bold">PEC Tracker & Advisor</span>
+                </a>
+            </li>
+            <li>
+                <a routerLink="/dashboard">
+                    <span class="icon"><i class="fa fa-home" aria-hidden="true"></i></span>
+                    <span class="title">Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a routerLink="/add-devices">
+                    <span class="icon"><i class="fa fa-laptop" aria-hidden="true"></i></span>
+                    <span class="title">Your Devices</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <span class="icon"><i class="fa fa-question-circle" aria-hidden="true"></i></span>
+                    <span class="title">Help</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <span class="icon"><i class="fa fa-cog" aria-hidden="true"></i></span>
+                    <span class="title">Settings</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <span class="icon"><i class="fa fa-sign-out" aria-hidden="true"></i></span>
+                    <span class="title">Sign out</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="main-input offset-lg-3 col-lg-6">
+        <div class="container">
+            <div class="row">
+                <div class="col text-center">
+                    <h3 class="pt-3 font-weight-bold">
+                        Add New Devices
+                    </h3>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <select class="form-control custom-select" id="deviceName" [(ngModel)]="selectedDevice" (change)="onDeviceSelect()">
+                        <option value="">Select Device</option>
+                        <option *ngFor="let device of getDeviceNames()" [value]="device">{{ device }}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <input type="text" class="form-control" placeholder="Consumption (W)" id="deviceConsumption" [(ngModel)]="deviceConsumption">
+                </div>
+                <div class="col-md-6">
+                    <input type="text" class="form-control" placeholder="Hours/Day" id="deviceHours">
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col text-center">
+                    <button class="btn btn-primary">Add Device</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

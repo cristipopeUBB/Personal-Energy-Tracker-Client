@@ -1,10 +1,24 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { LoginComponent } from './components/login/login.component';
+import { SignupComponent } from './components/signup/signup.component';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { CanActivate } from './guards/auth.guard';
+import { FormsModule } from '@angular/forms';
+import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
+import { AddDevicesComponent } from './components/add-devices/add-devices.component';
 
-const routes: Routes = [];
+const routes: Routes = [
+  {path:'', redirectTo:'login', pathMatch:'full'},
+  {path:'login', component: LoginComponent},
+  {path:'signup', component: SignupComponent},
+  {path:'dashboard', component: DashboardComponent, canActivate: [CanActivate]},
+  {path:'add-devices', component: AddDevicesComponent, canActivate: [CanActivate]},
+  {path:'reset-password', component: ResetPasswordComponent}
+];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  imports: [RouterModule.forRoot(routes), FormsModule],
+  exports: [RouterModule, FormsModule]
 })
 export class AppRoutingModule { }
