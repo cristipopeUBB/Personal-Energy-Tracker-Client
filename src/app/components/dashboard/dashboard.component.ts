@@ -12,16 +12,12 @@ export class DashboardComponent implements OnInit{
   public users : any = [];
   public fullName : string = "";
   WeatherData: any;
-  private latitude: string = "";
-  private longitude: string = "";
 
   constructor(private api : ApiService, private auth : AuthService, private userStoreService : UserStoreService) {
 
   }
   ngOnInit(): void {
     this.getWeatherData();
-    console.log(this.latitude);
-    console.log(this.longitude);
     this.api.getUsers()
       .subscribe(res => {
         this.users = res;

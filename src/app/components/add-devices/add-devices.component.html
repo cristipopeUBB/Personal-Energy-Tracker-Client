@@ -41,36 +41,41 @@
     </div>
 
     <div class="main-input offset-lg-3 col-lg-6">
-        <div class="container">
-            <div class="row">
-                <div class="col text-center">
-                    <h3 class="pt-3 font-weight-bold">
-                        Add New Devices
-                    </h3>
+        <form [formGroup]="addDeviceForm">
+            <div class="container">
+                <div class="row">
+                    <div class="col text-center">
+                        <h3 class="pt-3 font-weight-bold">
+                            Add New Devices
+                        </h3>
+                    </div>
                 </div>
-            </div>
 
-            <div class="row mt-3">
-                <div class="col-md-6">
-                    <select class="form-control custom-select" id="deviceName" [(ngModel)]="selectedDevice" (change)="onDeviceSelect()">
-                        <option value="">Select Device</option>
-                        <option *ngFor="let device of getDeviceNames()" [value]="device">{{ device }}</option>
-                    </select>
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <select class="form-control custom-select" id="deviceName" formControlName="name" (change)="onDeviceSelect()">
+                            <option value="">Select Device</option>
+                            <option *ngFor="let device of getDeviceNames()" [value]="device">{{ device }}</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <input type="text" style="display:none;" class="form-control" formControlName="userId">
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <input type="text" class="form-control" placeholder="Consumption (W)" id="deviceConsumption" formControlName="consumption">
+                    </div>
+                    <div class="col-md-6">
+                        <input type="text" class="form-control" placeholder="Hours/Day" id="deviceHours" formControlName="hoursUsed">
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col text-center">
+                        <button (click)="addDevice()" class="btn btn-primary">Add Device</button>
+                    </div>
                 </div>
             </div>
-            <div class="row mt-3">
-                <div class="col-md-6">
-                    <input type="text" class="form-control" placeholder="Consumption (W)" id="deviceConsumption" [(ngModel)]="deviceConsumption">
-                </div>
-                <div class="col-md-6">
-                    <input type="text" class="form-control" placeholder="Hours/Day" id="deviceHours">
-                </div>
-            </div>
-            <div class="row mt-3">
-                <div class="col text-center">
-                    <button class="btn btn-primary">Add Device</button>
-                </div>
-            </div>
-        </div>
+        </form>  
     </div>
 </div>

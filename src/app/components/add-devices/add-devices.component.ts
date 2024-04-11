@@ -1,4 +1,9 @@
 import { Component } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ApiService } from '../../services/api.service';
+import { UserStoreService } from '../../services/user-store.service';
+import { AuthService } from '../../services/auth.service';
+import { NgToastService } from 'ng-angular-popup';
 
 @Component({
   selector: 'app-add-devices',
@@ -61,13 +66,41 @@ export class AddDevicesComponent {
     "LED Light Bulb": 8
   };
 
+  addDeviceForm!: FormGroup;
   selectedDevice: string = '';
+  userId: number = 0;
+  fullName: string = '';
   public deviceConsumption: number | undefined;
-  
+  public deviceHours: number | undefined; // TODO: Add validation for this field
+
+  constructor(private apiService: ApiService, private fb: FormBuilder, private userStoreService : UserStoreService,
+    private authService: AuthService, private toast: NgToastService) {
+    
+  }
 
   ngOnInit() {
-    
+    this.userStoreService.getFullNameFromStore()
+      .subscribe(val => {
+        let fullNameFromToken = this.authService.getFullNameFromToken();
+        this.fullName = val || fullNameFromToken;
+      });
 
+    this.apiService.getUsers()
+      .subscribe({
+        next: (res:any) => {
+          this.userId = res.find((user:any) => user.username === this.fullName).id;
+        },
+        error: () => {
+          console.log("Error");
+        }
+    });
+
+    this.addDeviceForm = this.fb.group({
+      name: ['', Validators.required],
+      consumption: ['', Validators.required],
+      hoursUsed: ['', Validators.required],
+      userId: ['', Validators.required]
+    });
   }
 
   getDeviceNames(): string[] {
@@ -75,10 +108,26 @@ export class AddDevicesComponent {
   }
 
   onDeviceSelect() {
-    this.deviceConsumption = this.devices[this.selectedDevice];
+    //this.selectedDevice = this.devices[selectedDeviceId].valueOf();
+    //this.deviceConsumption = this.selectedDevice;
   }
 
   addDevice() {
-    
+    this.addDeviceForm.patchValue({userId: this.userId})
+
+    this.apiService.addDevice(this.addDeviceForm.value)
+      .subscribe({
+        next: (res:any) => {
+          console.log(res);
+          this.toast.success({
+              detail: 'Success',
+              summary: 'Device added successfully!',
+              duration: 3000,
+            });
+        },
+        error: () => {
+          console.log("Error");
+        }
+      });
   }
 }
