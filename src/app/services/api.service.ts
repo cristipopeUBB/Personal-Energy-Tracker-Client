@@ -16,4 +16,8 @@ export class ApiService {
   addDevice(data:any) {
     return this.http.post<any>(`${this.devicesUrl}add`,data);
   }
+
+  getUserDevices(userId: number) {
+    return this.http.get<any>(`${this.devicesUrl}get?userId=${userId}`);
+  }
 }

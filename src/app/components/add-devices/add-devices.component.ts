@@ -101,15 +101,20 @@ export class AddDevicesComponent {
       hoursUsed: ['', Validators.required],
       userId: ['', Validators.required]
     });
+
+    // Subscribe to value changes on the form control
+    this.addDeviceForm.get('name')!.valueChanges.subscribe((selectedDevice: string) => {
+      this.onDeviceSelect(selectedDevice);
+      this.addDeviceForm.get('consumption')!.setValue(this.deviceConsumption);
+    });
   }
 
   getDeviceNames(): string[] {
     return Object.keys(this.devices);
   }
 
-  onDeviceSelect() {
-    //this.selectedDevice = this.devices[selectedDeviceId].valueOf();
-    //this.deviceConsumption = this.selectedDevice;
+  onDeviceSelect(selectedDevice: string) {
+    this.deviceConsumption = this.devices[selectedDevice];
   }
 
   addDevice() {
