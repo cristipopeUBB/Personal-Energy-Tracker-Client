@@ -128,6 +128,36 @@
                 <div class="weatherWidgetRow" style="font-size: 35px;margin-top: 10px;">{{WeatherData.name}}</div>
                 <div class="weatherWidgetRow" style="font-size: 18px;">Humidity: {{WeatherData.main.humidity}}%</div>
             </div>
+            <div id="chatBot" *ngIf="showChat" class="chatContainer">
+                <div class="chatBox">
+                    <div class="chatHeader">
+                        <div class="headerContent">
+                            <h5>Chatbot Assistant</h5>
+                            <span (click)="toggleChat()"><i class="fa fa-times" aria-hidden="true"></i></span>
+                        </div>
+                    </div>
+                    <div class="chatBody">
+                        <div *ngFor="let message of chatMessages" class="messageContainer">
+                            <div *ngIf="message.sender === 'user'; else botMessage" class="userMessage">
+                                <label>{{ message.text }}</label>
+                            </div>
+                            <ng-template #botMessage>
+                                <div class="botMessage">
+                                    <i class="fa fa-robot mr-2" aria-hidden="true"></i>
+                                    <label>{{ message.text }}</label>
+                                </div>
+                            </ng-template>
+                        </div>
+                    </div>
+                    <div class="chatFooter">
+                        <input type="text" class="form-control" placeholder="Type your message here..." [(ngModel)]="searchText">
+                        <button class="btn btn-primary" (click)="sendMessage()">Send</button>
+                    </div>
+                </div>
+            </div>
+            <div class="chatIcon" (click)="toggleChat()">
+                <i class="fa fa-comments" aria-hidden="true"></i>
+            </div>
         </div>
     </div>
 </div>

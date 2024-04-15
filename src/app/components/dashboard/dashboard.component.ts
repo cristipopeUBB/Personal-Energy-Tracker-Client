@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { ApiService } from '../../services/api.service';
 import { UserStoreService } from '../../services/user-store.service';
+import { OpenAiService } from '../../services/open-ai.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -15,10 +16,18 @@ export class DashboardComponent implements OnInit{
   userId: number = 0;
   public userDevices: any = [];
 
-  constructor(private api : ApiService, private auth : AuthService, private userStoreService : UserStoreService,
-    private authService: AuthService) {
+  //openAi parameters
+  searchText : string = "";
+  showOutput : boolean = false;
+  output : string = "";
+  isLoading : boolean = false;
+  showChat : boolean = false;
+  chatMessages: { text: string; sender: string }[] = [];
 
+  constructor(private api : ApiService, private auth : AuthService, private userStoreService : UserStoreService,
+    private authService: AuthService, private openAiService : OpenAiService) {
   }
+
   ngOnInit(): void {
     this.getWeatherData();
     this.api.getUsers()
@@ -48,6 +57,43 @@ export class DashboardComponent implements OnInit{
           console.log("Error");
         }
     });
+  }
+
+  sendMessage(): void {
+      if (this.searchText.trim() !== '') {
+          this.chatMessages.push({ text: this.searchText, sender: 'user' });
+          this.getSuggestion(); // Call method to get bot response
+      }
+  }
+
+  getSuggestion() {
+    this.isLoading = true;
+    
+    this.output = "";
+    
+    this.openAiService.getData(this.searchText)
+      .subscribe({
+        next: (res:any) => {
+          this.output = res as string;
+          this.showOutput = true;
+          this.isLoading = false;
+          this.searchText = "";
+          this.chatMessages.push({ text: this.output, sender: 'bot' });
+        },
+        error: () => {
+          console.log("Error");
+          this.isLoading = false;
+          this.searchText = "";
+        }
+    });
+  }
+
+  toggleChat() {
+    this.showChat = !this.showChat;
+    if (this.showChat) {
+        // Reset loading state when chat is opened
+        this.isLoading = false;
+    }
   }
 
   logout() {

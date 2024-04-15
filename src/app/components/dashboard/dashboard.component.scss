@@ -99,6 +99,100 @@ body{
     left: 100px;
 }
 
+.chatIcon {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #007bff;
+    color: #fff;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 50px;
+    cursor: pointer;
+    z-index: 9999;
+}
+
+.chatContainer {
+    position: fixed;
+    bottom: 20px;
+    right: 60px;
+    max-width: 500px;
+    max-height: fit-content;
+}
+
+.chatBox {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.chatHeader {
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+}
+
+.headerContent {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.headerContent h5 {
+    margin: 0;
+}
+
+.headerContent span {
+    cursor: pointer;
+}
+
+.chatBody {
+    padding: 10px;
+    min-height: 250px; /* Adjust as needed */
+    max-height: 300px; /* Adjust as needed */
+    overflow-y: auto;
+}
+
+.messageContainer {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 10px;
+}
+
+.userMessage {
+    background-color: #007bff;
+    color: white;
+    border-radius: 10px;
+    padding: 10px;
+    max-width: 70%;
+    align-self: flex-end;
+}
+
+.botMessage {
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    padding: 10px;
+    max-width: 70%;
+}
+
+.chatFooter {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+}
+
+.chatFooter input[type="text"] {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.chatFooter button {
+    min-width: 80px;
+}
+
 .main .topbar {
     width: 100%;
     background: linear-gradient(to top, #8d8df8 60%, #cacaf8 130%) no-repeat;
