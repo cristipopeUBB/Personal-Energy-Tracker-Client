@@ -118,8 +118,18 @@ export class AddDevicesComponent {
   }
 
   addDevice() {
-    this.addDeviceForm.patchValue({userId: this.userId})
+    this.addDeviceForm.patchValue({userId: this.userId});
+    const randomConsumption = Math.floor(Math.random() * (5000 - 15 + 1)) + 15;
+    const randomHoursUsed = Math.floor(Math.random() * (12 - 1 + 1)) + 1;
 
+    // Set the random data in the form
+    this.addDeviceForm.patchValue({
+      consumption: randomConsumption,
+      hoursUsed: randomHoursUsed
+    });
+
+    // Submit the form
+    console.log(this.addDeviceForm.value);
     this.apiService.addDevice(this.addDeviceForm.value)
       .subscribe({
         next: (res:any) => {

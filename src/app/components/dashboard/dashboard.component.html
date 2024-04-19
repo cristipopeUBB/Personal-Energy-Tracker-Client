@@ -103,7 +103,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let device of userDevices">
+                        <tr *ngFor="let device of userDevices.slice(0,6)">
                             <td>{{ device.name }}</td>
                             <td>{{ device.consumption }}W</td>
                             <td>{{ device.hoursUsed }}</td>
@@ -127,6 +127,11 @@
                 <div class="weatherWidgetRow" style="font-size: 18px;">Feels Like: {{WeatherData.temp_feels_like}}°</div>
                 <div class="weatherWidgetRow" style="font-size: 35px;margin-top: 10px;">{{WeatherData.name}}</div>
                 <div class="weatherWidgetRow" style="font-size: 18px;">Humidity: {{WeatherData.main.humidity}}%</div>
+            </div>
+            <div id="consumptionPredictionChartDiv">
+                <canvas id="consumptionPredictionChart">
+                    
+                </canvas>
             </div>
             <div id="chatBot" *ngIf="showChat" class="chatContainer">
                 <div class="chatBox">
