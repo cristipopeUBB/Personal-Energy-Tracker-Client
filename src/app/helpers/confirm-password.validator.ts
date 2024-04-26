@@ -1,18 +1,18 @@
 import { FormGroup } from "@angular/forms";
 
 export function confirmPasswordValidator(controlName: string, matchControlName: string) {
-    return (formGroup : FormGroup) => {
+    return (formGroup: FormGroup) => {
         const passwordControl = formGroup.controls[controlName];
         const confirmPasswordControl = formGroup.controls[matchControlName];
 
-        if(confirmPasswordControl.errors && confirmPasswordControl.errors['confirmPasswordValidator']) {
+        if (confirmPasswordControl.errors && confirmPasswordControl.errors['confirmPasswordValidator']) {
             return;
         }
 
-        if(passwordControl.value !== confirmPasswordControl.value) {
-            confirmPasswordControl.setErrors({confirmPasswordValidator : true});
+        if (passwordControl.value !== confirmPasswordControl.value) {
+            confirmPasswordControl.setErrors({ confirmPasswordValidator: true });
         }
-        else{
+        else {
             confirmPasswordControl.setErrors(null);
         }
     }

@@ -73,9 +73,9 @@ export class AddDevicesComponent {
   public deviceConsumption: number | undefined;
   public deviceHours: number | undefined; // TODO: Add validation for this field
 
-  constructor(private apiService: ApiService, private fb: FormBuilder, private userStoreService : UserStoreService,
+  constructor(private apiService: ApiService, private fb: FormBuilder, private userStoreService: UserStoreService,
     private authService: AuthService, private toast: NgToastService) {
-    
+
   }
 
   ngOnInit() {
@@ -87,13 +87,13 @@ export class AddDevicesComponent {
 
     this.apiService.getUsers()
       .subscribe({
-        next: (res:any) => {
-          this.userId = res.find((user:any) => user.username === this.fullName).id;
+        next: (res: any) => {
+          this.userId = res.find((user: any) => user.username === this.fullName).id;
         },
         error: () => {
           console.log("Error");
         }
-    });
+      });
 
     this.addDeviceForm = this.fb.group({
       name: ['', Validators.required],
@@ -118,7 +118,7 @@ export class AddDevicesComponent {
   }
 
   addDevice() {
-    this.addDeviceForm.patchValue({userId: this.userId});
+    this.addDeviceForm.patchValue({ userId: this.userId });
     const randomConsumption = Math.floor(Math.random() * (5000 - 15 + 1)) + 15;
     const randomHoursUsed = Math.floor(Math.random() * (12 - 1 + 1)) + 1;
 
@@ -132,13 +132,13 @@ export class AddDevicesComponent {
     console.log(this.addDeviceForm.value);
     this.apiService.addDevice(this.addDeviceForm.value)
       .subscribe({
-        next: (res:any) => {
+        next: (res: any) => {
           console.log(res);
           this.toast.success({
-              detail: 'Success',
-              summary: 'Device added successfully!',
-              duration: 3000,
-            });
+            detail: 'Success',
+            summary: 'Device added successfully!',
+            duration: 3000,
+          });
         },
         error: () => {
           console.log("Error");

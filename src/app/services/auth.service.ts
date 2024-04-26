@@ -1,25 +1,25 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import {JwtHelperService} from '@auth0/angular-jwt';
+import { JwtHelperService } from '@auth0/angular-jwt';
 import { TokenApiModel } from '../models/token-api.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private baseUrl:string ="https://localhost:7208/api/User/";
-  private userPayload:any;
-  
-  constructor(private http : HttpClient, private router : Router) {
+  private baseUrl: string = "https://localhost:7208/api/User/";
+  private userPayload: any;
+
+  constructor(private http: HttpClient, private router: Router) {
     this.userPayload = this.decodedToken();
   }
 
-  signUp(userObj : any) {
+  signUp(userObj: any) {
     return this.http.post<any>(`${this.baseUrl}register`, userObj);
   }
 
-  login(userObj : any) {
+  login(userObj: any) {
     return this.http.post<any>(`${this.baseUrl}authenticate`, userObj);
   }
 
@@ -28,11 +28,11 @@ export class AuthService {
     this.router.navigate(['login']);
   }
 
-  storeToken(tokenValue : string) {
+  storeToken(tokenValue: string) {
     localStorage.setItem('token', tokenValue)
   }
 
-  storeRefreshToken(tokenValue : string) {
+  storeRefreshToken(tokenValue: string) {
     localStorage.setItem('refreshToken', tokenValue)
   }
 
@@ -44,7 +44,7 @@ export class AuthService {
     return localStorage.getItem('token');
   }
 
-  isLoggedIn() : boolean{
+  isLoggedIn(): boolean {
     return !!localStorage.getItem('token')
   }
 
@@ -55,18 +55,18 @@ export class AuthService {
   }
 
   getFullNameFromToken() {
-    if(this.userPayload) {
+    if (this.userPayload) {
       return this.userPayload.unique_name;
     }
   }
 
   getRoleFromToken() {
-    if(this.userPayload) {
+    if (this.userPayload) {
       return this.userPayload.role;
     }
   }
 
-  renewToken(tokenApi : TokenApiModel) {
+  renewToken(tokenApi: TokenApiModel) {
     return this.http.post<any>(`${this.baseUrl}refresh-token`, tokenApi);
   }
 }

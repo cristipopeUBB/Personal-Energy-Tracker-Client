@@ -12,10 +12,10 @@ import { ResetPasswordService } from '../../services/reset-password.service';
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
-export class LoginComponent implements OnInit{
+export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
 
-  public resetPasswordEmail! : string;
+  public resetPasswordEmail!: string;
   public isValidEmail!: boolean;
 
   constructor(
@@ -34,28 +34,28 @@ export class LoginComponent implements OnInit{
   }
 
   onLogin() {
-    if(this.loginForm.valid){
+    if (this.loginForm.valid) {
       // send obj to database
       this.authService.login(this.loginForm.value)
         .subscribe({
-          next:(res)=>{
+          next: (res) => {
             this.loginForm.reset();
             this.authService.storeToken(res.accessToken);
             this.authService.storeRefreshToken(res.refreshToken);
             const tokenPayload = this.authService.decodedToken(); // store the name and role of the user in the JWT token
             this.userStoreService.setFullNameForStore(tokenPayload.unique_name);
             this.userStoreService.setRoleForStore(tokenPayload.role);
-            
+
             this.router.navigate(['dashboard']);
           },
-          error:()=>{
-            this.toast.error({detail: "ERROR", summary: "Wrong username or password!", duration: 5000});
+          error: () => {
+            this.toast.error({ detail: "ERROR", summary: "Wrong username or password!", duration: 5000 });
           }
         })
     }
-    else{
+    else {
       ValidateForm.validateAllFormFields(this.loginForm);
-      this.toast.error({detail: "ERROR", summary: "Wrong username or password!", duration: 5000});
+      this.toast.error({ detail: "ERROR", summary: "Wrong username or password!", duration: 5000 });
     }
   }
 
@@ -68,14 +68,14 @@ export class LoginComponent implements OnInit{
   }
 
   confirmToSend() {
-    if(this.checkValidEmail(this.resetPasswordEmail)) {
+    if (this.checkValidEmail(this.resetPasswordEmail)) {
       console.log(this.resetPasswordEmail);
-      
+
       //API call
 
       this.resetPasswordService.sendResetPasswordLink(this.resetPasswordEmail)
         .subscribe({
-          next:(res) => {
+          next: (res) => {
             this.toast.success({
               detail: 'Success',
               summary: 'Email sent successfully!',

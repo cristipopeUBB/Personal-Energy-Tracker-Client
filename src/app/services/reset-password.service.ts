@@ -6,16 +6,16 @@ import { ResetPassword } from '../models/reset-password.model';
   providedIn: 'root'
 })
 export class ResetPasswordService { // This service handles the "Reset Email" API endpoints calls
-  private baseUrl : string = "https://localhost:7208/api/User";
-  constructor(private httpClient : HttpClient) {
+  private baseUrl: string = "https://localhost:7208/api/User";
+  constructor(private httpClient: HttpClient) {
 
   }
 
-  sendResetPasswordLink(email : string) {
+  sendResetPasswordLink(email: string) {
     return this.httpClient.post<any>(`${this.baseUrl}/send-reset-email/${email}`, {});
   }
 
-  resetPassword(resetPasswordObj : ResetPassword) {
+  resetPassword(resetPasswordObj: ResetPassword) {
     return this.httpClient.post<any>(`${this.baseUrl}/reset-password`, resetPasswordObj);
   }
 }

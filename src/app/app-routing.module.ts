@@ -10,13 +10,13 @@ import { AddDevicesComponent } from './components/add-devices/add-devices.compon
 import { HelpPageComponent } from './components/help-page/help-page.component';
 
 const routes: Routes = [
-  {path:'', redirectTo:'login', pathMatch:'full'},
-  {path:'login', component: LoginComponent},
-  {path:'signup', component: SignupComponent},
-  {path:'dashboard', component: DashboardComponent, canActivate: [CanActivate]},
-  {path:'add-devices', component: AddDevicesComponent, canActivate: [CanActivate]},
-  {path:'reset-password', component: ResetPasswordComponent},
-  {path:'help-page', component: HelpPageComponent}
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: 'login', component: LoginComponent },
+  { path: 'signup', component: SignupComponent },
+  { path: 'dashboard', component: DashboardComponent, canActivate: [CanActivate] },
+  { path: 'add-devices', component: AddDevicesComponent, canActivate: [CanActivate] },
+  { path: 'reset-password', component: ResetPasswordComponent },
+  { path: 'help-page', component: HelpPageComponent }
 ];
 
 @NgModule({

@@ -13,7 +13,7 @@ export class UserStoreService {
     return this.role$.asObservable();
   }
 
-  public setRoleForStore(role:string) {
+  public setRoleForStore(role: string) {
     this.role$.next(role);
   }
 
@@ -21,7 +21,7 @@ export class UserStoreService {
     return this.fullName$.asObservable();
   }
 
-  public setFullNameForStore(fullName:string) {
+  public setFullNameForStore(fullName: string) {
     this.fullName$.next(fullName);
   }
 }

@@ -4,7 +4,7 @@ import { ApiService } from '../../services/api.service';
 import { UserStoreService } from '../../services/user-store.service';
 import { OpenAiService } from '../../services/open-ai.service';
 import regression from 'regression';
-import { Chart, registerables} from 'chart.js';
+import { Chart, registerables } from 'chart.js';
 import { Observable, catchError, flatMap, forkJoin, map, throwError } from 'rxjs';
 
 @Component({
@@ -12,9 +12,9 @@ import { Observable, catchError, flatMap, forkJoin, map, throwError } from 'rxjs
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
-export class DashboardComponent implements OnInit{
-  public users : any = [];
-  public fullName : string = "";
+export class DashboardComponent implements OnInit {
+  public users: any = [];
+  public fullName: string = "";
   WeatherData: any = {
     isDay: true,
     temp_celcius: 0,
@@ -30,35 +30,35 @@ export class DashboardComponent implements OnInit{
   public userDevices: any = [];
 
   //location parameters
-  latitude : number = 0;
-  longitude : number = 0;
+  latitude: number = 0;
+  longitude: number = 0;
 
   //openAi parameters
-  searchText : string = "";
-  showOutput : boolean = false;
-  output : string = "";
-  isLoading : boolean = false;
-  showChat : boolean = false;
+  searchText: string = "";
+  showOutput: boolean = false;
+  output: string = "";
+  isLoading: boolean = false;
+  showChat: boolean = false;
   chatMessages: { text: string; sender: string }[] = [];
 
-  constructor(private api : ApiService, private auth : AuthService, private userStoreService : UserStoreService,
-    private authService: AuthService, private openAiService : OpenAiService) {
-      Chart.register(...registerables);
+  constructor(private api: ApiService, private auth: AuthService, private userStoreService: UserStoreService,
+    private authService: AuthService, private openAiService: OpenAiService) {
+    Chart.register(...registerables);
   }
 
   async ngOnInit() {
     await this.getLocation();
-          this.WeatherData.isDay = true;
+    this.WeatherData.isDay = true;
     this.api.getUsers()
       .subscribe(res => {
         this.users = res;
-    });
+      });
 
     this.userStoreService.getFullNameFromStore()
       .subscribe(val => {
         let fullNameFromToken = this.auth.getFullNameFromToken();
         this.fullName = val || fullNameFromToken;
-    });
+      });
 
     this.userStoreService.getFullNameFromStore()
       .subscribe(val => {
@@ -68,32 +68,32 @@ export class DashboardComponent implements OnInit{
 
     this.api.getUsers()
       .subscribe({
-        next: (res:any) => {
-          this.userId = res.find((user:any) => user.username === this.fullName).id;
+        next: (res: any) => {
+          this.userId = res.find((user: any) => user.username === this.fullName).id;
           this.loadData();
           console.log(this.userDevices);
         },
         error: () => {
           console.log("Error");
         }
-    });
+      });
   }
 
   sendMessage(): void {
-      if (this.searchText.trim() !== '') {
-          this.chatMessages.push({ text: this.searchText, sender: 'user' });
-          this.getSuggestion(); // Call method to get bot response
-      }
+    if (this.searchText.trim() !== '') {
+      this.chatMessages.push({ text: this.searchText, sender: 'user' });
+      this.getSuggestion(); // Call method to get bot response
+    }
   }
 
   getSuggestion() {
     this.isLoading = true;
-    
+
     this.output = "";
-    
+
     this.openAiService.getData(this.searchText)
       .subscribe({
-        next: (res:any) => {
+        next: (res: any) => {
           this.output = res as string;
           this.showOutput = true;
           this.isLoading = false;
@@ -105,14 +105,14 @@ export class DashboardComponent implements OnInit{
           this.isLoading = false;
           this.searchText = "";
         }
-    });
+      });
   }
 
   toggleChat() {
     this.showChat = !this.showChat;
     if (this.showChat) {
-        // Reset loading state when chat is opened
-        this.isLoading = false;
+      // Reset loading state when chat is opened
+      this.isLoading = false;
     }
   }
 
@@ -227,7 +227,7 @@ export class DashboardComponent implements OnInit{
           responsive: true, // Make the chart responsive
           maintainAspectRatio: false, // Prevent the chart from maintaining aspect ratio
           scales: {
-            x:{
+            x: {
               display: false
             }
           }
@@ -249,7 +249,7 @@ export class DashboardComponent implements OnInit{
         observer.error('User devices not loaded');
         return;
       }
-      
+
       // Calculate the end date of the next month
       const today = new Date();
       const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
@@ -301,7 +301,7 @@ export class DashboardComponent implements OnInit{
             y: {
               beginAtZero: true,
               ticks: {
-                callback: function(value, index, values) {
+                callback: function (value, index, values) {
                   return value + ' kWh'; // Append 'kWh' to each tick value
                 }
               }

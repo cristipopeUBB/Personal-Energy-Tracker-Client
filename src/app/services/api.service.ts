@@ -5,16 +5,16 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class ApiService {
-  private baseUrl:string ="https://localhost:7208/api/User/";
-  private devicesUrl:string ="https://localhost:7208/api/Device/";
-  constructor(private http : HttpClient) { }
+  private baseUrl: string = "https://localhost:7208/api/User/";
+  private devicesUrl: string = "https://localhost:7208/api/Device/";
+  constructor(private http: HttpClient) { }
 
   getUsers() {
     return this.http.get<any>(this.baseUrl);
   }
 
-  addDevice(data:any) {
-    return this.http.post<any>(`${this.devicesUrl}add`,data);
+  addDevice(data: any) {
+    return this.http.post<any>(`${this.devicesUrl}add`, data);
   }
 
   getUserDevices(userId: number) {

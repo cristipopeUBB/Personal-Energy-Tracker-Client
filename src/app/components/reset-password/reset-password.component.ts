@@ -12,16 +12,16 @@ import { NgToastService } from 'ng-angular-popup';
   templateUrl: './reset-password.component.html',
   styleUrl: './reset-password.component.scss'
 })
-export class ResetPasswordComponent implements OnInit{
-  resetPasswordForm! : FormGroup;
-  emailToReset! : string;
-  emailToken! : string;
+export class ResetPasswordComponent implements OnInit {
+  resetPasswordForm!: FormGroup;
+  emailToReset!: string;
+  emailToken!: string;
   resetPasswordObj = new ResetPassword();
 
   constructor(
-    private fb : FormBuilder, 
+    private fb: FormBuilder,
     private activatedRoute: ActivatedRoute,
-    private resetPasswordService : ResetPasswordService,
+    private resetPasswordService: ResetPasswordService,
     private toast: NgToastService,
     private router: Router) { }
 
@@ -42,7 +42,7 @@ export class ResetPasswordComponent implements OnInit{
   }
 
   resetPassword() {
-    if(this.resetPasswordForm.valid) {
+    if (this.resetPasswordForm.valid) {
       this.resetPasswordObj.email = this.emailToReset;
       this.resetPasswordObj.newPassword = this.resetPasswordForm.value.password;
       this.resetPasswordObj.confirmPassword = this.resetPasswordForm.value.confirmPassword;
@@ -50,9 +50,9 @@ export class ResetPasswordComponent implements OnInit{
 
       this.resetPasswordService.resetPassword(this.resetPasswordObj)
         .subscribe({
-          next:(res) => {
+          next: (res) => {
             this.toast.success({
-              detail:"SUCCESS",
+              detail: "SUCCESS",
               summary: "Password reset successfully",
               duration: 3000,
             });
@@ -60,7 +60,7 @@ export class ResetPasswordComponent implements OnInit{
           },
           error: (err) => {
             this.toast.error({
-              detail:"ERROR",
+              detail: "ERROR",
               summary: "Something went wrong! Please try again.",
               duration: 5000,
             });

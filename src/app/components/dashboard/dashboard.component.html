@@ -32,7 +32,7 @@
                 </a>
             </li>
             <li>
-                <a class="logoutBtn" (click) = "logout()">
+                <a class="logoutBtn" (click)="logout()">
                     <span class="icon"><i class="fa fa-sign-out" aria-hidden="true"></i></span>
                     <span class="title">Sign out</span>
                 </a>
@@ -45,11 +45,11 @@
             <div class="user">
                 <span class="fa fa-user p-2 mb-1"></span>
                 <span class="p-2 font-weight-bold">Hi there, <b>{{fullName}}</b></span>
-                
+
             </div>
         </div>
         <div class="cardBox">
-            <div class="card"> 
+            <div class="card">
                 <div>
                     <div class="numbers">1,042</div>
                     <div class="cardName">Total energy consumed</div>
@@ -58,7 +58,7 @@
                     <i class="fa fa-eye" aria-hidden="true"></i>
                 </div>
             </div>
-            <div class="card"> 
+            <div class="card">
                 <div>
                     <div class="numbers">80</div>
                     <div class="cardName">kWh produced</div>
@@ -67,7 +67,7 @@
                     <i class="fa fa-shopping-cart" aria-hidden="true"></i>
                 </div>
             </div>
-            <div class="card"> 
+            <div class="card">
                 <div>
                     <div class="numbers">208</div>
                     <div class="cardName">TEST</div>
@@ -76,7 +76,7 @@
                     <i class="fa fa-comment" aria-hidden="true"></i>
                 </div>
             </div>
-            <div class="card"> 
+            <div class="card">
                 <div>
                     <div class="numbers">$6,042</div>
                     <div class="cardName">TEST</div>
@@ -112,7 +112,7 @@
                     </tbody>
                 </table>
             </div>
-            <div class="mt-4 ml-4 d-flex text-center" id="weatherMain"> 
+            <div class="mt-4 ml-4 d-flex text-center" id="weatherMain">
                 <div *ngIf="WeatherData.isDay" class="weatherWidgetRow">
                     <i class="fas fa-3x fa-sun sun"></i>
                 </div>
@@ -122,13 +122,16 @@
                 <div class="weatherWidgetRow cloudDiv">
                     <i class="fas fa-3x fa-cloud cloud"></i>
                 </div>
-                <div class="weatherWidgetRow" style="font-size: 32px;margin-top: 5px;">{{WeatherData.temp_celcius}}°</div>
-                <div class="weatherWidgetRow" style="font-size: 18px;">{{WeatherData.temp_min}}° / {{WeatherData.temp_max}}°</div>
-                <div class="weatherWidgetRow" style="font-size: 18px;">Feels Like: {{WeatherData.temp_feels_like}}°</div>
+                <div class="weatherWidgetRow" style="font-size: 32px;margin-top: 5px;">{{WeatherData.temp_celcius}}°
+                </div>
+                <div class="weatherWidgetRow" style="font-size: 18px;">{{WeatherData.temp_min}}° /
+                    {{WeatherData.temp_max}}°</div>
+                <div class="weatherWidgetRow" style="font-size: 18px;">Feels Like: {{WeatherData.temp_feels_like}}°
+                </div>
                 <div class="weatherWidgetRow" style="font-size: 35px;margin-top: 10px;">{{WeatherData.name}}</div>
                 <div class="weatherWidgetRow" style="font-size: 18px;">Humidity: {{WeatherData.main.humidity}}%</div>
             </div>
-            
+
             <div id="consumptionPredictionChartDiv">
                 <canvas id="consumptionPredictionChart">
                 </canvas>
@@ -159,7 +162,8 @@
                         </div>
                     </div>
                     <div class="chatFooter">
-                        <input type="text" class="form-control" placeholder="Type your message here..." [(ngModel)]="searchText">
+                        <input type="text" class="form-control" placeholder="Type your message here..."
+                            [(ngModel)]="searchText">
                         <button class="btn btn-primary" (click)="sendMessage()">Send</button>
                     </div>
                 </div>
