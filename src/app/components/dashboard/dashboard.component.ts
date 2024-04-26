@@ -15,9 +15,23 @@ import { Observable, catchError, flatMap, forkJoin, map, throwError } from 'rxjs
 export class DashboardComponent implements OnInit{
   public users : any = [];
   public fullName : string = "";
-  WeatherData: any;
+  WeatherData: any = {
+    isDay: true,
+    temp_celcius: 0,
+    temp_min: 0,
+    temp_max: 0,
+    temp_feels_like: 0,
+    temp_icon: '',
+    main: {
+      humidity: 0,
+    }
+  };
   userId: number = 0;
   public userDevices: any = [];
+
+  //location parameters
+  latitude : number = 0;
+  longitude : number = 0;
 
   //openAi parameters
   searchText : string = "";
@@ -32,8 +46,9 @@ export class DashboardComponent implements OnInit{
       Chart.register(...registerables);
   }
 
-  ngOnInit(): void {
-    this.getWeatherData();
+  async ngOnInit() {
+    await this.getLocation();
+          this.WeatherData.isDay = true;
     this.api.getUsers()
       .subscribe(res => {
         this.users = res;
@@ -105,16 +120,60 @@ export class DashboardComponent implements OnInit{
     this.auth.signOut();
   }
 
-  async getWeatherData() { // Trebuie sa dau manual coordonatele pentru ca nu am acces la locatia utilizatorului momentan
-    // https://api.openweathermap.org/data/2.5/weather?lat=46.7712&lon=23.6236&appid=d2feb633db3a1d7ffee4c93fec2dc30f
-    let data = JSON.parse('{"coord":{"lon":21.9189,"lat":47.0465},"weather":[{"id":801,"main":"Clouds","description":"few clouds","icon":"02d"}],"base":"stations","main":{"temp":285.43,"feels_like":283.78,"temp_min":285.21,"temp_max":285.43,"pressure":1012,"humidity":41},"visibility":10000,"wind":{"speed":1.54,"deg":280},"clouds":{"all":20},"dt":1713534275,"sys":{"type":2,"id":50396,"country":"RO","sunrise":1713497789,"sunset":1713547552},"timezone":10800,"id":671768,"name":"Oradea","cod":200}')
-    this.setWeatherData(data);
+  getCurrentLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        this.latitude = position.coords.latitude;
+        this.longitude = position.coords.longitude;
+      });
+    } else {
+      alert("Geolocation is not supported by this browser.");
+    }
+  }
+
+  async getLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          let latitude = position.coords.latitude;
+          let longitude = position.coords.longitude;
+          await this.getWeatherData(latitude, longitude);
+        },
+        (error) => {
+          console.error('Error getting location:', error);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 5000, // Timeout in milliseconds (optional)
+          maximumAge: 0 // Maximum age of cached position (optional)
+        }
+      );
+    } else {
+      console.error('Geolocation is not supported by this browser.');
+    }
+  }
+
+  async getWeatherData(latitude: number, longitude: number) {
+    let url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=d2feb633db3a1d7ffee4c93fec2dc30f`;
+
+    try {
+      let response = await fetch(url);
+      if (response.ok) {
+        let data = await response.json();
+        this.setWeatherData(data);
+      } else {
+        console.error('Failed to fetch weather data:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error fetching weather data:', error);
+    }
   }
 
   loadData() {
     this.loadDevicesOfCurrentUser()
       .pipe(
-        flatMap(() => this.populateRegressionChart())
+        flatMap(() => this.populateRegressionChart()),
+        flatMap(() => this.populateMostUsedDevicesChart())
       )
       .subscribe({
         error: (error) => {
@@ -122,7 +181,6 @@ export class DashboardComponent implements OnInit{
         }
       });
   }
-
 
   loadDevicesOfCurrentUser() {
     return this.api.getUserDevices(this.userId)
@@ -141,6 +199,46 @@ export class DashboardComponent implements OnInit{
           return throwError(error);
         })
       );
+  }
+
+  populateMostUsedDevicesChart() {
+    return new Observable<any>(observer => {
+      const devices = this.userDevices;
+      if (!devices || devices.length === 0) {
+        // If devices are not loaded yet, wait for them
+        observer.error('User devices not loaded');
+        return;
+      }
+      // Create the chart that shows the most consumption devices (top 5)
+      const ctxMostExpensive = document.getElementById('mostConsumptionExpensiveDevicesChart') as HTMLCanvasElement;
+      const myChartMostExpensive = new Chart(ctxMostExpensive, {
+        type: 'line',
+        data: {
+          labels: this.userDevices.slice(0, 5).map((device: any) => device.name), // Assuming device has a name property
+          datasets: [{
+            label: 'Top 5 devices with the highest consumption (W)',
+            data: this.userDevices.slice(0, 5).map((device: any) => device.consumption),
+            backgroundColor: 'rgba(255, 99, 132, 0.2)', // Adjust bar color
+            borderColor: 'rgba(255, 99, 132, 1)', // Adjust border color
+            borderWidth: 1 // Adjust border width
+          }]
+        },
+        options: {
+          responsive: true, // Make the chart responsive
+          maintainAspectRatio: false, // Prevent the chart from maintaining aspect ratio
+          scales: {
+            x:{
+              display: false
+            }
+          }
+        }
+      });
+
+      // Notify that chart population is complete
+      observer.next(myChartMostExpensive);
+      observer.complete();
+    });
+
   }
 
   populateRegressionChart() { // This is the chart that shows the predicted consumption for the next month

@@ -20,7 +20,7 @@
                 </a>
             </li>
             <li>
-                <a href="#">
+                <a routerLink="/help-page">
                     <span class="icon"><i class="fa fa-question-circle" aria-hidden="true"></i></span>
                     <span class="title">Help</span>
                 </a>
@@ -112,7 +112,7 @@
                     </tbody>
                 </table>
             </div>
-            <div id="weatherMain"> 
+            <div class="mt-4 ml-4 d-flex text-center" id="weatherMain"> 
                 <div *ngIf="WeatherData.isDay" class="weatherWidgetRow">
                     <i class="fas fa-3x fa-sun sun"></i>
                 </div>
@@ -128,9 +128,13 @@
                 <div class="weatherWidgetRow" style="font-size: 35px;margin-top: 10px;">{{WeatherData.name}}</div>
                 <div class="weatherWidgetRow" style="font-size: 18px;">Humidity: {{WeatherData.main.humidity}}%</div>
             </div>
+            
             <div id="consumptionPredictionChartDiv">
                 <canvas id="consumptionPredictionChart">
-                    
+                </canvas>
+            </div>
+            <div class="mostConsumptionExpensiveDevicesChart">
+                <canvas id="mostConsumptionExpensiveDevicesChart">
                 </canvas>
             </div>
             <div id="chatBot" *ngIf="showChat" class="chatContainer">

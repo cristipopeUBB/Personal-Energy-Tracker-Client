@@ -12,6 +12,7 @@ import { NgToastModule } from 'ng-angular-popup';
 import { TokenInterceptor } from './interceptors/token.interceptor';
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 import { AddDevicesComponent } from './components/add-devices/add-devices.component';
+import { HelpPageComponent } from './components/help-page/help-page.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import { AddDevicesComponent } from './components/add-devices/add-devices.compon
     SignupComponent,
     DashboardComponent,
     ResetPasswordComponent,
-    AddDevicesComponent
+    AddDevicesComponent,
+    HelpPageComponent
   ],
   imports: [
     BrowserModule,
