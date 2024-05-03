@@ -4,6 +4,9 @@ import { ApiService } from '../../services/api.service';
 import { UserStoreService } from '../../services/user-store.service';
 import { AuthService } from '../../services/auth.service';
 import { NgToastService } from 'ng-angular-popup';
+import { catchError, map, throwError } from 'rxjs';
+import { DeviceUsage } from '../dashboard/dashboard.component';
+import { PaginationInstance } from 'ngx-pagination';
 
 @Component({
   selector: 'app-add-devices',
@@ -72,10 +75,15 @@ export class AddDevicesComponent {
   fullName: string = '';
   public deviceConsumption: number | undefined;
   public deviceHours: number | undefined; // TODO: Add validation for this field
+  public userDevices: any = [];
+
+  pagedDevices: any[] = []; // Devices for the current page
+  currentPage: number = 1; // Current page number
+  itemsPerPage: number = 10; // Number of items per page
 
   constructor(private apiService: ApiService, private fb: FormBuilder, private userStoreService: UserStoreService,
     private authService: AuthService, private toast: NgToastService) {
-
+      
   }
 
   ngOnInit() {
@@ -89,6 +97,16 @@ export class AddDevicesComponent {
       .subscribe({
         next: (res: any) => {
           this.userId = res.find((user: any) => user.username === this.fullName).id;
+          this.loadDevicesOfCurrentUser().pipe(
+            catchError(error => {
+              console.error('Error loading devices:', error);
+              return throwError(error);
+            })).subscribe({
+              next: () => {
+                // Devices loaded successfully, now populate userDevices
+                console.log(this.userDevices);
+              }
+            });
         },
         error: () => {
           console.log("Error");
@@ -111,6 +129,42 @@ export class AddDevicesComponent {
 
   getDeviceNames(): string[] {
     return Object.keys(this.devices);
+  }
+
+  deleteDevice(device: any) {
+    
+  }
+
+  loadDevicesOfCurrentUser() {
+    return this.apiService.getUserDevices(this.userId)
+      .pipe(
+        map((res: any[]) => {
+          // Process the usage field of each device and convert it into a string
+          this.userDevices = res.map(device => ({
+            ...device,
+            usageString: this.getUsageString(device.usage)
+          }));
+          console.log(this.userDevices);
+          return this.userDevices;
+        }),
+        catchError(error => {
+          console.error('Error loading devices:', error);
+          return throwError(error);
+        })
+      );
+  }
+
+  getUsageString(usage: DeviceUsage): string {
+    switch (usage) {
+      case DeviceUsage.Low:
+        return 'Low';
+      case DeviceUsage.Medium:
+        return 'Medium';
+      case DeviceUsage.High:
+        return 'High';
+      default:
+        return '';
+    }
   }
 
   onDeviceSelect(selectedDevice: string) {

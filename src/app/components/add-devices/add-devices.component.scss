@@ -154,3 +154,82 @@ h3 {
     background-color: #0056b3;
     border-color: #0056b3;
 }
+
+.details table{
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.details table thead td{
+    font-weight: 600;
+}
+
+.details .recentDevices table tr{
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+.details .recentDevices table tr:hover{
+    background: #03a9f4;
+    color: #fff;
+}
+
+.details .recentDevices table tbody tr:hover{
+    background: #906bee;
+    color: #fff;
+}
+
+.details .recentDevices table tbody tr:last-child{
+    border-bottom: none;
+}
+
+.details .recentDevices table tr td {
+    padding: 9px 5px;
+}
+
+.details .recentDevices table thead tr td:last-child,
+.details .recentDevices table tbody tr td:last-child{
+    text-align: left;
+}
+
+.details .recentDevices table thead tr td:nth-child(2),
+.details .recentDevices table tbody tr td:nth-child(2){
+    text-align: left;
+    padding-right: 20px;
+}
+
+.details .recentDevices table thead tr td:nth-child(3),
+.details .recentDevices table tbody tr td:nth-child(3){
+    text-align: left;
+}
+
+.status {
+    position: relative;
+    padding: 2px 4px;
+    color: #fff;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 300;
+    letter-spacing: 1px;
+}
+
+.Low{
+    background: #8de02c;
+}
+
+.Medium{
+    background: #f9ca3f;
+}
+
+.High {
+    background: #f00;
+}
+
+.details .recentDevices{
+    position: relative;
+    display: grid;
+    min-height: 350px;
+    background: #fff;
+    padding: 20px;
+}
+

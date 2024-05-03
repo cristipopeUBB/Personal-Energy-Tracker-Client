@@ -5,7 +5,7 @@ import { UserStoreService } from '../../services/user-store.service';
 import { OpenAiService } from '../../services/open-ai.service';
 import regression from 'regression';
 import { Chart, registerables } from 'chart.js';
-import { Observable, catchError, flatMap, forkJoin, map, throwError } from 'rxjs';
+import { Observable, catchError, flatMap, forkJoin, map, merge, mergeMap, throwError } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
@@ -28,6 +28,9 @@ export class DashboardComponent implements OnInit {
   };
   userId: number = 0;
   public userDevices: any = [];
+  public userConsumption: any = 0;
+  public isUserProsumer: any = false;
+  public userMonthlyCost: any = 0;
 
   //location parameters
   latitude: number = 0;
@@ -70,6 +73,7 @@ export class DashboardComponent implements OnInit {
       .subscribe({
         next: (res: any) => {
           this.userId = res.find((user: any) => user.username === this.fullName).id;
+          this.isUserProsumer = res.find((user: any) => user.username === this.fullName).isProsumer;
           this.loadData();
           console.log(this.userDevices);
         },
@@ -172,14 +176,48 @@ export class DashboardComponent implements OnInit {
   loadData() {
     this.loadDevicesOfCurrentUser()
       .pipe(
-        flatMap(() => this.populateRegressionChart()),
-        flatMap(() => this.populateMostUsedDevicesChart())
+        mergeMap(() => this.populateRegressionChart()),
+        mergeMap(() => this.populateMostUsedDevicesChart()),
+        mergeMap(() => this.calculateTotalConsumption())
       )
       .subscribe({
         error: (error) => {
           console.error('Error loading data:', error);
         }
       });
+  }
+
+  calculateTotalConsumption() { // This method calculates the total consumption and monthly cost of the user
+    return new Observable(() => {
+      const devices = this.userDevices;
+      if (!devices || devices.length === 0) {
+        this.userConsumption = 0;
+        this.userMonthlyCost = 0;
+        return 0;
+      }
+
+      // the formula is Energy (kWh) = Power (W) × Time (h) / 1000
+      this.userConsumption = devices.reduce((total: number, device: { consumption: number; hoursUsed: number; }) => total + (device.consumption * device.hoursUsed / 1000), 0);
+      
+      // the formula for monthly cost is Cost = Energy (kWh) × Price (per kWh)
+      if (this.userConsumption <= 100) {
+        this.userMonthlyCost = this.userConsumption * 0.68;
+      } else if (this.userConsumption <= 255) {
+        this.userMonthlyCost = 100 * 0.68 + (this.userConsumption - 100) * 0.8;
+      }
+      else if (this.userConsumption <= 300) {
+        this.userMonthlyCost = 100 * 0.68 + (255 - 100) * 0.8 + (this.userConsumption - 255) * 1.3;
+      }
+      else {
+        this.userMonthlyCost = 100 * 0.68 + (255 - 100) * 0.8 + (300 - 255) * 1.3 + (this.userConsumption - 300) * 1.3;
+      }
+      // for one month (30 days) the formula is Cost = Energy (kWh) × Price (per kWh) × 30
+      this.userMonthlyCost *= 30;
+      // round to 2 decimal places
+      this.userMonthlyCost = Math.round(this.userMonthlyCost * 100) / 100;
+      return this.userConsumption;
+
+    });
   }
 
   loadDevicesOfCurrentUser() {
@@ -238,7 +276,6 @@ export class DashboardComponent implements OnInit {
       observer.next(myChartMostExpensive);
       observer.complete();
     });
-
   }
 
   populateRegressionChart() { // This is the chart that shows the predicted consumption for the next month

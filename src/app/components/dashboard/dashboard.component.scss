@@ -310,7 +310,7 @@ body{
     grid-template-columns: 2fr 1fr;
 }
 
-.details .recentOrders{
+.details .recentDevices{
     position: relative;
     display: grid;
     min-height: 350px;
@@ -347,41 +347,41 @@ body{
     font-weight: 600;
 }
 
-.details .recentOrders table tr{
+.details .recentDevices table tr{
     border-bottom: 1px solid rgba(0,0,0,0.1);
 }
 
-.details .recentOrders table tr:hover{
+.details .recentDevices table tr:hover{
     background: #03a9f4;
     color: #fff;
 }
 
-.details .recentOrders table tbody tr:hover{
+.details .recentDevices table tbody tr:hover{
     background: #906bee;
     color: #fff;
 }
 
-.details .recentOrders table tbody tr:last-child{
+.details .recentDevices table tbody tr:last-child{
     border-bottom: none;
 }
 
-.details .recentOrders table tr td {
+.details .recentDevices table tr td {
     padding: 9px 5px;
 }
 
-.details .recentOrders table thead tr td:last-child,
-.details .recentOrders table tbody tr td:last-child{
+.details .recentDevices table thead tr td:last-child,
+.details .recentDevices table tbody tr td:last-child{
     text-align: left;
 }
 
-.details .recentOrders table thead tr td:nth-child(2),
-.details .recentOrders table tbody tr td:nth-child(2){
+.details .recentDevices table thead tr td:nth-child(2),
+.details .recentDevices table tbody tr td:nth-child(2){
     text-align: left;
     padding-right: 20px;
 }
 
-.details .recentOrders table thead tr td:nth-child(3),
-.details .recentOrders table tbody tr td:nth-child(3){
+.details .recentDevices table thead tr td:nth-child(3),
+.details .recentDevices table tbody tr td:nth-child(3){
     text-align: left;
 }
 
@@ -495,10 +495,10 @@ body{
     .cardBox{
         grid-template-columns: repeat(1,1fr);
     }
-    .details .recentOrders{
+    .details .recentDevices{
         overflow-x: auto;
     }
-    .details .recentOrders table{
+    .details .recentDevices table{
         width: 600px;
     }
     .navigation{

@@ -13,6 +13,7 @@ import { TokenInterceptor } from './interceptors/token.interceptor';
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 import { AddDevicesComponent } from './components/add-devices/add-devices.component';
 import { HelpPageComponent } from './components/help-page/help-page.component';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 @NgModule({
   declarations: [
@@ -29,7 +30,8 @@ import { HelpPageComponent } from './components/help-page/help-page.component';
     AppRoutingModule,
     ReactiveFormsModule,
     HttpClientModule,
-    NgToastModule
+    NgToastModule,
+    NgxPaginationModule
   ],
   providers: [
     provideClientHydration(),

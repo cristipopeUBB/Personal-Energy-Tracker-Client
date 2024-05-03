@@ -2,8 +2,8 @@
     <div class="navigation">
         <ul>
             <li>
-                <a href="#">
-                    <span class="icon"><i class="fa fa-lightbulb-o" aria-hidden="true"></i></span>
+                <a routerLink="/dashboard">
+                    <span class="icon"><i class="fa fa-lightbulb" aria-hidden="true"></i></span>
                     <span class="title font-weight-bold">PEC Tracker & Advisor</span>
                 </a>
             </li>
@@ -39,45 +39,61 @@
             </li>
         </ul>
     </div>
-
     <div class="main-input offset-lg-3 col-lg-6">
-        <form [formGroup]="addDeviceForm">
-            <div class="container">
-                <div class="row">
-                    <div class="col text-center">
-                        <h3 class="pt-3 font-weight-bold">
-                            Add New Devices
-                        </h3>
+        <div class="row">
+            <div class="details">
+                <div class="recentDevices">
+                    <div class="cardHeader">
+                        <h2>Your Devices</h2>
                     </div>
-                </div>
-
-                <div class="row mt-3">
-                    <div class="col-md-6">
-                        <select class="form-control custom-select" id="deviceName" formControlName="name">
-                            <option value="">Select Device</option>
-                            <option *ngFor="let device of getDeviceNames()" [value]="device">{{ device }}</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <input type="text" style="display:none;" class="form-control" formControlName="userId">
-                    </div>
-                </div>
-                <div class="row mt-3">
-                    <div class="col-md-6">
-                        <input type="text" class="form-control" placeholder="Consumption (W)" id="deviceConsumption"
-                            formControlName="consumption">
-                    </div>
-                    <div class="col-md-6">
-                        <input type="text" class="form-control" placeholder="Hours/Day" id="deviceHours"
-                            formControlName="hoursUsed">
-                    </div>
-                </div>
-                <div class="row mt-3">
-                    <div class="col text-center">
-                        <button (click)="addDevice()" class="btn btn-primary">Add Device</button>
-                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Base consumption</th>
+                                <th>Hours used</th>
+                                <th>Usage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                                *ngFor="let device of userDevices | paginate: { itemsPerPage: 5, currentPage: currentPage }">
+                                <td>{{ device.name }}</td>
+                                <td>{{ device.consumption }}W</td>
+                                <td>{{ device.hoursUsed }}</td>
+                                <td><span [ngClass]="'status ' + device.usageString">{{ device.usageString }}</span>
+                                </td>
+                                <td><button (click)="deleteDevice(device)" class="btn btn-danger">Delete</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <pagination-controls (pageChange)="currentPage = $event"></pagination-controls>
                 </div>
             </div>
-        </form>
+            <form [formGroup]="addDeviceForm">
+                    <div class="row">
+                        <div class="col text-center">
+                            <h3 class="pt-3 font-weight-bold">
+                                Add New Devices
+                            </h3>
+                        </div>
+                    </div>
+    
+                    <div class="row mt-3">
+                        <div class="col-md-4">
+                            <select class="form-control custom-select" id="deviceName" formControlName="name">
+                                <option value="">Select Device</option>
+                                <option *ngFor="let device of getDeviceNames()" [value]="device">{{ device }}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <button (click)="addDevice()" class="btn btn-primary">Add Device</button>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" style="display:none;" class="form-control" formControlName="userId">
+                        </div>
+                    </div>
+            </form>
+        </div>
     </div>
 </div>

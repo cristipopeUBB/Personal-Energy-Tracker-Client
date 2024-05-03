@@ -2,8 +2,8 @@
     <div class="navigation">
         <ul>
             <li>
-                <a href="#">
-                    <span class="icon"><i class="fa fa-lightbulb-o" aria-hidden="true"></i></span>
+                <a routerLink="/dashboard">
+                    <span class="icon"><i class="fa fa-lightbulb" aria-hidden="true"></i></span>
                     <span class="title font-weight-bold">PEC Tracker & Advisor</span>
                 </a>
             </li>
@@ -17,6 +17,12 @@
                 <a routerLink="/add-devices">
                     <span class="icon"><i class="fa fa-laptop" aria-hidden="true"></i></span>
                     <span class="title">Your Devices</span>
+                </a>
+            </li>
+            <li *ngIf="isUserProsumer">
+                <a routerLink="/prosumer">
+                    <span class="icon"><i class="fa-solid fa-solar-panel" aria-hidden="true"></i></span>
+                    <span class="title">Prosumer</span>
                 </a>
             </li>
             <li>
@@ -45,20 +51,19 @@
             <div class="user">
                 <span class="fa fa-user p-2 mb-1"></span>
                 <span class="p-2 font-weight-bold">Hi there, <b>{{fullName}}</b></span>
-
             </div>
         </div>
         <div class="cardBox">
             <div class="card">
                 <div>
-                    <div class="numbers">1,042</div>
-                    <div class="cardName">Total energy consumed</div>
+                    <div class="numbers">{{userConsumption}} kWh</div>
+                    <div class="cardName">Energy consumed today</div>
                 </div>
                 <div class="iconBox">
                     <i class="fa fa-eye" aria-hidden="true"></i>
                 </div>
             </div>
-            <div class="card">
+            <div *ngIf="isUserProsumer" class="card">
                 <div>
                     <div class="numbers">80</div>
                     <div class="cardName">kWh produced</div>
@@ -78,8 +83,8 @@
             </div>
             <div class="card">
                 <div>
-                    <div class="numbers">$6,042</div>
-                    <div class="cardName">TEST</div>
+                    <div class="numbers">${{userMonthlyCost}}</div>
+                    <div class="cardName">Energy bill cost</div>
                 </div>
                 <div class="iconBox">
                     <i class="fa fa-usd" aria-hidden="true"></i>
@@ -88,7 +93,7 @@
         </div>
 
         <div class="details">
-            <div class="recentOrders">
+            <div class="recentDevices">
                 <div class="cardHeader">
                     <h2>Recent Devices</h2>
                     <a routerLink="/add-devices" class="btn">View All</a>
