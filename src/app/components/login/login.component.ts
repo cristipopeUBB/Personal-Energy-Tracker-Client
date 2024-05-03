@@ -33,6 +33,12 @@ export class LoginComponent implements OnInit {
     });
   }
 
+  onEnterKeypress(event: KeyboardEvent) {
+    if (event.key === "Enter") {
+      this.onLogin();
+    }
+  }
+
   onLogin() {
     if (this.loginForm.valid) {
       // send obj to database

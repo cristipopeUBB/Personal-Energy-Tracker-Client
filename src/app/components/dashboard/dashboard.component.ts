@@ -75,7 +75,6 @@ export class DashboardComponent implements OnInit {
           this.userId = res.find((user: any) => user.username === this.fullName).id;
           this.isUserProsumer = res.find((user: any) => user.username === this.fullName).isProsumer;
           this.loadData();
-          console.log(this.userDevices);
         },
         error: () => {
           console.log("Error");
@@ -198,7 +197,7 @@ export class DashboardComponent implements OnInit {
 
       // the formula is Energy (kWh) = Power (W) × Time (h) / 1000
       this.userConsumption = devices.reduce((total: number, device: { consumption: number; hoursUsed: number; }) => total + (device.consumption * device.hoursUsed / 1000), 0);
-      
+
       // the formula for monthly cost is Cost = Energy (kWh) × Price (per kWh)
       if (this.userConsumption <= 100) {
         this.userMonthlyCost = this.userConsumption * 0.68;
@@ -215,8 +214,8 @@ export class DashboardComponent implements OnInit {
       this.userMonthlyCost *= 30;
       // round to 2 decimal places
       this.userMonthlyCost = Math.round(this.userMonthlyCost * 100) / 100;
+      this.userConsumption = Math.round(this.userConsumption * 100) / 100;
       return this.userConsumption;
-
     });
   }
 
@@ -229,7 +228,6 @@ export class DashboardComponent implements OnInit {
             ...device,
             usageString: this.getUsageString(device.usage)
           }));
-          console.log(this.userDevices);
           return this.userDevices;
         }),
         catchError(error => {

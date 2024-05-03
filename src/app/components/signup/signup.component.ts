@@ -26,6 +26,7 @@ export class SignupComponent implements OnInit {
       userName: ['', Validators.required],
       email: ['', Validators.required],
       password: ['', Validators.required],
+      prosumer: [false] // Default value of prosumer checkbox
     })
   }
 

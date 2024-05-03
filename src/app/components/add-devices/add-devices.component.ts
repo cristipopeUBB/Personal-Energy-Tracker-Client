@@ -6,7 +6,6 @@ import { AuthService } from '../../services/auth.service';
 import { NgToastService } from 'ng-angular-popup';
 import { catchError, map, throwError } from 'rxjs';
 import { DeviceUsage } from '../dashboard/dashboard.component';
-import { PaginationInstance } from 'ngx-pagination';
 
 @Component({
   selector: 'app-add-devices',
@@ -76,6 +75,7 @@ export class AddDevicesComponent {
   public deviceConsumption: number | undefined;
   public deviceHours: number | undefined; // TODO: Add validation for this field
   public userDevices: any = [];
+  public isUserProsumer: any = false;
 
   pagedDevices: any[] = []; // Devices for the current page
   currentPage: number = 1; // Current page number
@@ -83,7 +83,7 @@ export class AddDevicesComponent {
 
   constructor(private apiService: ApiService, private fb: FormBuilder, private userStoreService: UserStoreService,
     private authService: AuthService, private toast: NgToastService) {
-      
+
   }
 
   ngOnInit() {
@@ -97,6 +97,7 @@ export class AddDevicesComponent {
       .subscribe({
         next: (res: any) => {
           this.userId = res.find((user: any) => user.username === this.fullName).id;
+          this.isUserProsumer = res.find((user: any) => user.username === this.fullName).isProsumer;
           this.loadDevicesOfCurrentUser().pipe(
             catchError(error => {
               console.error('Error loading devices:', error);
@@ -104,7 +105,6 @@ export class AddDevicesComponent {
             })).subscribe({
               next: () => {
                 // Devices loaded successfully, now populate userDevices
-                console.log(this.userDevices);
               }
             });
         },
@@ -132,7 +132,28 @@ export class AddDevicesComponent {
   }
 
   deleteDevice(device: any) {
-    
+    if (!confirm('Are you sure you want to delete this device?')) {
+      return;
+    }
+
+    this.apiService.deleteDevice(device.id)
+      .subscribe({
+        next: (res: any) => {
+          //reset the table data
+          this.loadDevicesOfCurrentUser().subscribe({
+            next: () => {
+            }
+          });
+          this.toast.success({
+            detail: 'Success',
+            summary: 'Device deleted successfully!',
+            duration: 3000,
+          });
+        },
+        error: () => {
+          console.log("Error");
+        }
+      });
   }
 
   loadDevicesOfCurrentUser() {
@@ -144,7 +165,6 @@ export class AddDevicesComponent {
             ...device,
             usageString: this.getUsageString(device.usage)
           }));
-          console.log(this.userDevices);
           return this.userDevices;
         }),
         catchError(error => {
@@ -172,6 +192,15 @@ export class AddDevicesComponent {
   }
 
   addDevice() {
+    if(this.addDeviceForm.value.name === '') {
+      this.toast.error({
+        detail: 'ERROR',
+        summary: 'Please select a device!',
+        duration: 3000,
+      });
+      return;
+    }
+
     this.addDeviceForm.patchValue({ userId: this.userId });
     const randomConsumption = Math.floor(Math.random() * (5000 - 15 + 1)) + 15;
     const randomHoursUsed = Math.floor(Math.random() * (12 - 1 + 1)) + 1;
@@ -183,11 +212,15 @@ export class AddDevicesComponent {
     });
 
     // Submit the form
-    console.log(this.addDeviceForm.value);
     this.apiService.addDevice(this.addDeviceForm.value)
       .subscribe({
         next: (res: any) => {
           console.log(res);
+          //reset the table data
+          this.loadDevicesOfCurrentUser().subscribe({
+            next: () => {
+            }
+          });
           this.toast.success({
             detail: 'Success',
             summary: 'Device added successfully!',

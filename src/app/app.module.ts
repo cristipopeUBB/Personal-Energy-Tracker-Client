@@ -14,6 +14,7 @@ import { ResetPasswordComponent } from './components/reset-password/reset-passwo
 import { AddDevicesComponent } from './components/add-devices/add-devices.component';
 import { HelpPageComponent } from './components/help-page/help-page.component';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { ProsumerComponent } from './components/prosumer/prosumer.component';
 
 @NgModule({
   declarations: [
@@ -23,7 +24,8 @@ import { NgxPaginationModule } from 'ngx-pagination';
     DashboardComponent,
     ResetPasswordComponent,
     AddDevicesComponent,
-    HelpPageComponent
+    HelpPageComponent,
+    ProsumerComponent
   ],
   imports: [
     BrowserModule,

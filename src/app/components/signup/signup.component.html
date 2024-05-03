@@ -20,6 +20,7 @@
                             <small
                                 *ngIf="signUpForm.controls['firstName'].dirty && signUpForm.hasError('required','firstName')"
                                 class="text-danger">*First name is required</small>
+                            <!-- Add Last Name input field -->
                             <div class="form-group pt-3">
                                 <div class="input-field"
                                     [class.error]="signUpForm.controls['lastName'].dirty && signUpForm.hasError('required','lastName')">
@@ -30,6 +31,7 @@
                             <small
                                 *ngIf="signUpForm.controls['lastName'].dirty && signUpForm.hasError('required','lastName')"
                                 class="text-danger">*Last name is required</small>
+                            <!-- Add Email input field -->
                             <div class="form-group pt-3">
                                 <div class="input-field"
                                     [class.error]="signUpForm.controls['email'].dirty && signUpForm.hasError('required','email')">
@@ -39,6 +41,7 @@
                             </div>
                             <small *ngIf="signUpForm.controls['email'].dirty && signUpForm.hasError('required','email')"
                                 class="text-danger">*Email is required</small>
+                            <!-- Add Username input field -->
                             <div class="form-group pt-3">
                                 <div class="input-field"
                                     [class.error]="signUpForm.controls['userName'].dirty && signUpForm.hasError('required','userName')">
@@ -49,6 +52,7 @@
                             <small
                                 *ngIf="signUpForm.controls['userName'].dirty && signUpForm.hasError('required','userName')"
                                 class="text-danger">*Username is required</small>
+                            <!-- Add Password input field -->
                             <div class="form-group pt-3">
                                 <div class="input-field"
                                     [class.error]="signUpForm.controls['password'].dirty && signUpForm.hasError('required','password')">
@@ -59,20 +63,26 @@
                             <small
                                 *ngIf="signUpForm.controls['password'].dirty && signUpForm.hasError('required','password')"
                                 class="text-danger">*Password is required</small>
+                            <!-- Add Prosumer checkbox -->
+                            <!-- Add Prosumer checkbox -->
+                            <div class="form-group pt-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="prosumerCheckbox"
+                                        formControlName="prosumer">
+                                    <label class="form-check-label" for="prosumerCheckbox">
+                                        I'm a prosumer
+                                    </label>
+                                </div>
+                            </div>
+                            <!-- Sign up button -->
                             <button (click)="onSignup()" type="submit" class="btn btn-primary btn-block mt-4 w-100">Sign
                                 up</button>
+                            <!-- Already have an account -->
                             <div class="text-center pt-4 text-muted">Already have an account?
                                 <a id="forget" [routerLink]="['/login']">Login</a>
                             </div>
                         </form>
                     </div>
-                    <!-- <div class="mx-3 my-2 py-2 bordert">
-                        <div class="text-center py-3">
-                            <a href="https://www.facebook.com" target="_blank" class="px-2"> <img src="https://www.dpreview.com/files/p/articles/4698742202/facebook.jpeg" alt=""></a>
-                            <a href="https://www.google.com" target="_blank" class="px-2"> <img src="https://www.freepnglogos.com/uploads/google-logo-png/google-logo-png-suite-everything-you-need-know-about-google-newest-0.png" alt=""></a>
-                            <a href="https://www.github.com" target="_blank" class="px-2"> <img src="https://www.freepnglogos.com/uploads/512x512-logo-png/512x512-logo-github-icon-35.png" alt=""></a>
-                        </div>
-                    </div> -->
                 </div>
             </div>
         </div>

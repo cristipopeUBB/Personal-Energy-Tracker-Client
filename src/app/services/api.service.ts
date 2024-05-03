@@ -17,6 +17,10 @@ export class ApiService {
     return this.http.post<any>(`${this.devicesUrl}add`, data);
   }
 
+  deleteDevice(deviceId: number) {
+    return this.http.delete<any>(`${this.devicesUrl}delete?deviceId=${deviceId}`);
+  }
+
   getUserDevices(userId: number) {
     return this.http.get<any>(`${this.devicesUrl}get?userId=${userId}`);
   }

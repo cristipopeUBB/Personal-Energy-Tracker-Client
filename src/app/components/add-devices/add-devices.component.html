@@ -19,6 +19,12 @@
                     <span class="title">Your Devices</span>
                 </a>
             </li>
+            <li *ngIf="isUserProsumer">
+                <a routerLink="/prosumer">
+                    <span class="icon"><i class="fa-solid fa-solar-panel" aria-hidden="true"></i></span>
+                    <span class="title">Prosumer</span>
+                </a>
+            </li>
             <li>
                 <a routerLink="/help-page">
                     <span class="icon"><i class="fa fa-question-circle" aria-hidden="true"></i></span>
@@ -39,7 +45,7 @@
             </li>
         </ul>
     </div>
-    <div class="main-input offset-lg-3 col-lg-6">
+    <div class="main">
         <div class="row">
             <div class="details">
                 <div class="recentDevices">
@@ -69,31 +75,34 @@
                     </table>
                     <pagination-controls (pageChange)="currentPage = $event"></pagination-controls>
                 </div>
+                <div class="mt-4 ml-4 d-flex text-center">
+                    <form [formGroup]="addDeviceForm">
+                        <div class="row">
+                            <div class="col text-center">
+                                <h3 class="pt-3 font-weight-bold">
+                                    Add New Devices
+                                </h3>
+                            </div>
+                        </div>
+        
+                        <div class="row mt-3">
+                            <div class="col-md-8">
+                                <select class="form-control custom-select" id="deviceName" formControlName="name">
+                                    <option value="">Select Device</option>
+                                    <option *ngFor="let device of getDeviceNames()" [value]="device">{{ device }}</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <input type="text" style="display:none;" class="form-control" formControlName="userId">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <button (click)="addDevice()" class="btn btn-primary form-group">Add Device</button>
+                        </div>
+                </form>
+                </div>
             </div>
-            <form [formGroup]="addDeviceForm">
-                    <div class="row">
-                        <div class="col text-center">
-                            <h3 class="pt-3 font-weight-bold">
-                                Add New Devices
-                            </h3>
-                        </div>
-                    </div>
-    
-                    <div class="row mt-3">
-                        <div class="col-md-4">
-                            <select class="form-control custom-select" id="deviceName" formControlName="name">
-                                <option value="">Select Device</option>
-                                <option *ngFor="let device of getDeviceNames()" [value]="device">{{ device }}</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <button (click)="addDevice()" class="btn btn-primary">Add Device</button>
-                        </div>
-                        <div class="col-md-4">
-                            <input type="text" style="display:none;" class="form-control" formControlName="userId">
-                        </div>
-                    </div>
-            </form>
         </div>
     </div>
 </div>

@@ -155,6 +155,18 @@ h3 {
     border-color: #0056b3;
 }
 
+.details {
+    position: relative;
+    width: 100%;
+    padding: 20px;
+    padding-top: 0;
+    display: grid;
+    grid-gap: 20px;
+    grid-template-columns: 2fr 1fr;
+}
+
+
+
 .details table{
     width: 100%;
     border-collapse: collapse;
