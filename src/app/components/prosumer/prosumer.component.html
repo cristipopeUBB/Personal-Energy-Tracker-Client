@@ -38,15 +38,72 @@
                 </a>
             </li>
             <li>
-                <a class="logoutBtn" (click)="logout()">
+                <a href="#">
                     <span class="icon"><i class="fa fa-sign-out" aria-hidden="true"></i></span>
                     <span class="title">Sign out</span>
                 </a>
             </li>
         </ul>
     </div>
-
     <div class="main">
-        
+        <div class="details">
+            <div class="recentDevices">
+                <div class="cardHeader">
+                    <h2>Your Solar Panels</h2>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Power</th>
+                            <th>Quantity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr
+                            *ngFor="let device of userSolarPanels | paginate: { itemsPerPage: 5, currentPage: currentPage }">
+                            <td>{{ device.name }}</td>
+                            <td>{{ device.power }}W</td>
+                            <td>{{ device.quantity }}</td>
+                            <td><button (click)="deleteSolarPanel(device)" class="btn btn-danger">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <pagination-controls (pageChange)="currentPage = $event"></pagination-controls>
+            </div>
+
+            <div class="mt-4 ml-4 d-flex">
+                <form [formGroup]="addSolarPanelForm">
+                    <div class="row">
+                        <div class="col">
+                            <h4 class="pt-3 font-weight-bold">
+                                Add Solar Panel
+                            </h4>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <select class="form-control custom-select" id="deviceName" formControlName="name" placeholder="Select Solar Panel">
+                                <option value="">Select Solar Panel</option>
+                                <option *ngFor="let solarPanel of getSolarPanelNames()" [value]="solarPanel">{{
+                                    solarPanel }}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="number" class="form-control" formControlName="quantity" placeholder="Quantity">
+                        </div>
+
+                        <div class="col-md-1">
+                            <input type="text" style="display:none;" class="form-control" formControlName="userId">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <button (click)="addSolarPanel()" class="btn btn-primary form-group">Add Panel</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
     </div>
 </div>

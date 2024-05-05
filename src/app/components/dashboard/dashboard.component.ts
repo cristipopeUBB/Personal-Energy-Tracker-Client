@@ -31,6 +31,7 @@ export class DashboardComponent implements OnInit {
   public userConsumption: any = 0;
   public isUserProsumer: any = false;
   public userMonthlyCost: any = 0;
+  public totalDailyPowerOutput: number = 0;
 
   //location parameters
   latitude: number = 0;
@@ -43,6 +44,7 @@ export class DashboardComponent implements OnInit {
   isLoading: boolean = false;
   showChat: boolean = false;
   chatMessages: { text: string; sender: string }[] = [];
+  public userSolarPanels: any = [];
 
   constructor(private api: ApiService, private auth: AuthService, private userStoreService: UserStoreService,
     private authService: AuthService, private openAiService: OpenAiService) {
@@ -134,6 +136,29 @@ export class DashboardComponent implements OnInit {
     }
   }
 
+  // Formula for Solar Panel Power Output
+  // Daily watt hours = Solar panel power * 6.06(hours of daylight in Romania) * 0.85(average efficiency)
+  // Converted into kWh = Daily watt hours / 1000
+  // Monthly watt hours = Daily watt hours * 30
+
+  calculateDailyPowerOutput(power: number): number {
+    return power * 6.06 * 0.85 / 1000;
+  }
+
+  calculateTotalDailyPowerOutput() {
+    return Observable.create((observer: any) => {
+
+      this.totalDailyPowerOutput = this.userSolarPanels.reduce((acc: number, solarPanel: any) => {
+        return acc + this.calculateDailyPowerOutput(solarPanel.power) * solarPanel.quantity;
+      }, 0).toFixed(2);
+
+      console.log('Total daily power output:', this.totalDailyPowerOutput);
+
+      observer.next();
+      observer.complete();
+    });
+  }
+
   async getLocation() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -173,7 +198,7 @@ export class DashboardComponent implements OnInit {
   }
 
   loadData() {
-    this.loadDevicesOfCurrentUser()
+    this.loadDevicesOfCurrentUser() // load devices of the current user
       .pipe(
         mergeMap(() => this.populateRegressionChart()),
         mergeMap(() => this.populateMostUsedDevicesChart()),
@@ -181,9 +206,34 @@ export class DashboardComponent implements OnInit {
       )
       .subscribe({
         error: (error) => {
-          console.error('Error loading data:', error);
+          console.error('Error loading devices for user:', error);
         }
       });
+    this.loadSolarPanelsOfCurrentUser() // load solar panels of the current user
+      .pipe(
+        mergeMap(() => this.calculateTotalDailyPowerOutput())
+      )
+      .subscribe({
+        error: (error) => {
+          console.error('Error loading solar panels for user:', error);
+        }
+      });
+  }
+
+  loadSolarPanelsOfCurrentUser() {
+    return this.api.getUserSolarPanels(this.userId)
+      .pipe(
+        map((res: any[]) => {
+          this.userSolarPanels = res.map(device => ({
+            ...device,
+          }));
+          return this.userSolarPanels;
+        }),
+        catchError(error => {
+          console.error('Error loading devices:', error);
+          return throwError(error);
+        })
+      );
   }
 
   calculateTotalConsumption() { // This method calculates the total consumption and monthly cost of the user

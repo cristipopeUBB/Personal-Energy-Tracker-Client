@@ -98,3 +98,86 @@ body{
     width: calc(100% - 100px);
     left: 100px;
 }
+
+.details {
+    position: relative;
+    width: 100%;
+    padding: 10px;
+    padding-top: 0;
+    display: grid;
+    grid-gap: 10px;
+    grid-template-columns: 2fr 1fr;
+}
+
+
+.details table{
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.details table thead td{
+    font-weight: 600;
+}
+
+.details .recentDevices table tr{
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+.details .recentDevices table tr:hover{
+    background: #03a9f4;
+    color: #fff;
+}
+
+.details .recentDevices table tbody tr:hover{
+    background: #906bee;
+    color: #fff;
+}
+
+.details .recentDevices table tbody tr:last-child{
+    border-bottom: none;
+}
+
+.details .recentDevices table tr td {
+    padding: 9px 5px;
+}
+
+.details .recentDevices table thead tr td:last-child,
+.details .recentDevices table tbody tr td:last-child{
+    text-align: left;
+}
+
+.details .recentDevices table thead tr td:nth-child(2),
+.details .recentDevices table tbody tr td:nth-child(2){
+    text-align: left;
+    padding-right: 20px;
+}
+
+.details .recentDevices table thead tr td:nth-child(3),
+.details .recentDevices table tbody tr td:nth-child(3){
+    text-align: left;
+}
+
+.details .recentDevices{
+    position: relative;
+    display: grid;
+    min-height: 350px;
+    background: #fff;
+    padding: 20px;
+}
+
+.cardHeader{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.cardHeader h2{
+    font-weight: 600;
+}
+
+tr {
+    height: 5px !important; /* Adjust this value as needed */
+    width: 5px !important;
+}
+

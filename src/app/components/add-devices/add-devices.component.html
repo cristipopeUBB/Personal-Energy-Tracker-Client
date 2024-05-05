@@ -52,7 +52,11 @@
                     <div class="cardHeader">
                         <h2>Your Devices</h2>
                     </div>
+                    <div class="col-md-4">
+                        <button (click)="openAddDeviceModal()" data-toggle="modal" data-target="#addDeviceModal" class="btn btn-primary">Add New Device</button>
+                    </div>
                     <table>
+
                         <thead>
                             <tr>
                                 <th>Name</th>
@@ -76,32 +80,42 @@
                     <pagination-controls (pageChange)="currentPage = $event"></pagination-controls>
                 </div>
                 <div class="mt-4 ml-4 d-flex text-center">
-                    <form [formGroup]="addDeviceForm">
-                        <div class="row">
-                            <div class="col text-center">
-                                <h3 class="pt-3 font-weight-bold">
-                                    Add New Devices
-                                </h3>
-                            </div>
-                        </div>
-        
-                        <div class="row mt-3">
-                            <div class="col-md-8">
-                                <select class="form-control custom-select" id="deviceName" formControlName="name">
-                                    <option value="">Select Device</option>
-                                    <option *ngFor="let device of getDeviceNames()" [value]="device">{{ device }}</option>
-                                </select>
-                            </div>
-                            
-                            <div class="col-md-4">
-                                <input type="text" style="display:none;" class="form-control" formControlName="userId">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <button (click)="addDevice()" class="btn btn-primary form-group">Add Device</button>
-                        </div>
-                </form>
+                    <div id="categoryChartDiv">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
                 </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addDeviceModal" tabindex="-1" role="dialog" aria-labelledby="addDeviceModalLabel" aria-hidden="true" [ngClass]="{'show': isAddDeviceModalOpen}">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Device</h5>
+            </div>
+            <div class="modal-body">
+                <form [formGroup]="addDeviceForm">
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <select class="form-control custom-select" id="deviceName" formControlName="name">
+                                <option value="">Select Device</option>
+                                <option *ngFor="let device of getDeviceNames()" [value]="device">{{ device }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="col-md-4">
+                            <input type="text" style="display:none;" class="form-control" formControlName="userId">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="closeAddDeviceModalBtn" type="button" class="btn btn-secondary" data-dismiss="modal" (click)="closeAddDeviceModal()">Close</button>
+                <button type="button" class="btn btn-primary" (click)="addDevice()">Add Device</button>
             </div>
         </div>
     </div>
