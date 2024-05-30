@@ -5,6 +5,7 @@ import { ApiService } from '../../services/api.service';
 import { NgToastService } from 'ng-angular-popup';
 import { UserStoreService } from '../../services/user-store.service';
 import { Observable, catchError, map, mergeMap, throwError } from 'rxjs';
+import { Chart, registerables } from 'chart.js';
 
 @Component({
   selector: 'app-prosumer',
@@ -33,14 +34,16 @@ export class ProsumerComponent {
   }
 
   addSolarPanelForm!: FormGroup;
+  editUserForm!: FormGroup;
   userId: number = 0;
   fullName: string = '';
   public userSolarPanels: any = [];
 
-  currentPage: number = 1; 
+  currentPage: number = 1;
 
   constructor(private apiService: ApiService, private formBuilder: FormBuilder,
     private toast: NgToastService, private authService: AuthService, private userStoreService: UserStoreService) {
+    Chart.register(...registerables);
   }
 
   ngOnInit() {
@@ -55,8 +58,9 @@ export class ProsumerComponent {
         next: (res: any) => {
           this.userId = res.find((user: any) => user.username === this.fullName).id;
           this.loadSolarPanelsOfCurrentUser().pipe(
+            mergeMap(() => this.initializeSolarPanelsConsumptionChart()),
             catchError(error => {
-              console.error('Error loading devices:', error);
+              console.error('Error loading solar panels:', error);
               return throwError(error);
             })).subscribe({
               next: () => {
@@ -69,12 +73,30 @@ export class ProsumerComponent {
         }
       });
 
-      this.addSolarPanelForm = this.formBuilder.group({
-        name: ['', Validators.required],
-        quantity: ['', Validators.required],
-        userId: ['', Validators.required],
-        power: ['', Validators.required]
-      });
+    this.addSolarPanelForm = this.formBuilder.group({
+      name: ['', Validators.required],
+      quantity: ['', Validators.required],
+      userId: ['', Validators.required],
+      power: ['', Validators.required]
+    });
+
+    this.editUserForm = this.formBuilder.group({
+      email: ['', Validators.required],
+      password: ['', Validators.required],
+      id: ['', Validators.required]
+    });
+  }
+
+  isAddDeviceModalOpen: boolean = false;
+
+  // Method to open the modal
+  openAddDeviceModal() {
+    this.isAddDeviceModalOpen = true;
+  }
+
+  // Method to close the modal
+  closeAddDeviceModal() {
+    this.isAddDeviceModalOpen = false;
   }
 
   loadSolarPanelsOfCurrentUser() {
@@ -101,7 +123,24 @@ export class ProsumerComponent {
     return Object.keys(this.solarPanels);
   }
 
-  deleteSolarPanel(solarPanel : any) {
+  editUserSettings() {
+    this.editUserForm.patchValue({ id: this.userId });
+    this.apiService.editUser(this.editUserForm.value)
+    .subscribe({
+      next: (res: any) => {
+        this.toast.success({
+          detail: 'Success',
+          summary: 'User settings updated successfully!',
+          duration: 3000,
+        });
+      },
+      error: () => {
+        console.log("Error");
+      }
+    });
+  }
+
+  deleteSolarPanel(solarPanel: any) {
     if (!confirm('Are you sure you want to delete this solar panel?')) {
       return;
     }
@@ -126,11 +165,63 @@ export class ProsumerComponent {
       });
   }
 
-  addSolarPanel(){
-    if(this.addSolarPanelForm.value.name === '') {
+  initializeSolarPanelsConsumptionChart() {
+
+    return new Observable<any>(observer => {
+
+      // Formula for Solar Panel Power Output
+      // Daily watt hours = Solar panel power * 6.06(hours of daylight in Romania) * 0.85(average efficiency)
+      // Converted into kWh = Daily watt hours / 1000
+      // Monthly watt hours = Daily watt hours * 30
+      // Converted into kWh = Monthly watt hours / 1000
+
+      const solarPanels = this.userSolarPanels;
+      const labels = solarPanels.map((solarPanel: any) => solarPanel.name);
+      const data = solarPanels.map((solarPanel: any) => {
+        const dailyWattHours = solarPanel.quantity* (solarPanel.power * 6.06 * 0.85);
+        const monthlyWattHours = dailyWattHours * 30;
+        const monthlyKWh = monthlyWattHours / 1000;
+        return monthlyKWh;
+      });
+
+      var ctx = document.getElementById('solarPanelsConsumptionChart') as HTMLCanvasElement;
+      var solarPanelsConsumptionChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Monthly energy produced (kWh)',
+            data: data,
+            backgroundColor: 'rgba(54, 62, 235, 0.2)',
+            borderColor: 'rgba(54, 162, 135, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true
+            },
+            x: {
+              display: false
+            }
+          }
+        }
+      });
+
+      observer.next(solarPanelsConsumptionChart);
+      observer.complete();
+
+    });
+  }
+
+  addSolarPanel() {
+    if (this.addSolarPanelForm.value.name === '') {
       this.toast.error({
         detail: 'ERROR',
-        summary: 'Please select a device!',
+        summary: 'Please select a solar panel!',
         duration: 3000,
       });
       return;
@@ -153,6 +244,7 @@ export class ProsumerComponent {
           this.loadSolarPanelsOfCurrentUser().subscribe({
             next: () => {
               //reset the form
+              document.getElementById('closeAddDeviceModalBtn')?.click(); // close the modal
               this.addSolarPanelForm.reset();
             }
           });

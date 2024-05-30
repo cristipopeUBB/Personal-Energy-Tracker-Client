@@ -5,7 +5,9 @@ import { UserStoreService } from '../../services/user-store.service';
 import { OpenAiService } from '../../services/open-ai.service';
 import regression from 'regression';
 import { Chart, registerables } from 'chart.js';
-import { Observable, catchError, flatMap, forkJoin, map, merge, mergeMap, throwError } from 'rxjs';
+import { Observable, catchError, concat, concatMap, flatMap, forkJoin, map, merge, mergeMap, of, throwError } from 'rxjs';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { NgToastService } from 'ng-angular-popup';
 
 @Component({
   selector: 'app-dashboard',
@@ -32,6 +34,8 @@ export class DashboardComponent implements OnInit {
   public isUserProsumer: any = false;
   public userMonthlyCost: any = 0;
   public totalDailyPowerOutput: number = 0;
+  public dailyCostSaving: number = 0;
+  editUserForm!: FormGroup;
 
   //location parameters
   latitude: number = 0;
@@ -47,7 +51,8 @@ export class DashboardComponent implements OnInit {
   public userSolarPanels: any = [];
 
   constructor(private api: ApiService, private auth: AuthService, private userStoreService: UserStoreService,
-    private authService: AuthService, private openAiService: OpenAiService) {
+    private authService: AuthService, private openAiService: OpenAiService, private toast: NgToastService,
+    private formBuilder: FormBuilder) {
     Chart.register(...registerables);
   }
 
@@ -82,6 +87,41 @@ export class DashboardComponent implements OnInit {
           console.log("Error");
         }
       });
+
+    this.editUserForm = this.formBuilder.group({
+      email: ['', Validators.required],
+      password: ['', Validators.required],
+      id: ['', Validators.required]
+    });
+  }
+
+  isAddDeviceModalOpen: boolean = false;
+
+  // Method to open the modal
+  openAddDeviceModal() {
+    this.isAddDeviceModalOpen = true;
+  }
+
+  // Method to close the modal
+  closeAddDeviceModal() {
+    this.isAddDeviceModalOpen = false;
+  }
+
+  editUserSettings() {
+    this.editUserForm.patchValue({ id: this.userId });
+    this.api.editUser(this.editUserForm.value)
+    .subscribe({
+      next: (res: any) => {
+        this.toast.success({
+          detail: 'Success',
+          summary: 'User settings updated successfully!',
+          duration: 3000,
+        });
+      },
+      error: () => {
+        console.log("Error");
+      }
+    });
   }
 
   sendMessage(): void {
@@ -136,6 +176,29 @@ export class DashboardComponent implements OnInit {
     }
   }
 
+  calculateDailyCostSaving() {
+    return Observable.create((observer: any) => {
+      //daily cost saving = (total energy consumption - energy produced by solar panels) * electricity price
+      let savedEnergy = this.userConsumption - this.totalDailyPowerOutput;
+      if(savedEnergy <= 100) {
+        this.dailyCostSaving = savedEnergy * 0.68;
+      } else if(savedEnergy <= 255) {
+        this.dailyCostSaving = 100 * 0.68 + (savedEnergy - 100) * 0.8;
+      }
+      else if(savedEnergy <= 300) {
+        this.dailyCostSaving = 100 * 0.68 + (255 - 100) * 0.8 + (savedEnergy - 255) * 1.3;
+      }
+      else {
+        this.dailyCostSaving = 100 * 0.68 + (255 - 100) * 0.8 + (300 - 255) * 1.3 + (savedEnergy - 300) * 1.3;
+      }
+
+      this.dailyCostSaving = Number(this.dailyCostSaving.toFixed(2));
+
+      observer.next();
+      observer.complete();
+    });
+  }
+
   // Formula for Solar Panel Power Output
   // Daily watt hours = Solar panel power * 6.06(hours of daylight in Romania) * 0.85(average efficiency)
   // Converted into kWh = Daily watt hours / 1000
@@ -151,8 +214,6 @@ export class DashboardComponent implements OnInit {
       this.totalDailyPowerOutput = this.userSolarPanels.reduce((acc: number, solarPanel: any) => {
         return acc + this.calculateDailyPowerOutput(solarPanel.power) * solarPanel.quantity;
       }, 0).toFixed(2);
-
-      console.log('Total daily power output:', this.totalDailyPowerOutput);
 
       observer.next();
       observer.complete();
@@ -198,27 +259,24 @@ export class DashboardComponent implements OnInit {
   }
 
   loadData() {
-    this.loadDevicesOfCurrentUser() // load devices of the current user
-      .pipe(
-        mergeMap(() => this.populateRegressionChart()),
-        mergeMap(() => this.populateMostUsedDevicesChart()),
-        mergeMap(() => this.calculateTotalConsumption())
+    concat(
+      this.loadSolarPanelsOfCurrentUser().pipe(
+        concatMap(() => this.calculateTotalDailyPowerOutput())
+      ),
+      this.loadDevicesOfCurrentUser().pipe(
+        concatMap(() => this.populateRegressionChart()),
+        concatMap(() => this.populateMostUsedDevicesChart()),
+        concatMap(() => this.calculateTotalConsumption()),
+        concatMap(() => this.calculateDailyCostSaving())
       )
+    )
       .subscribe({
         error: (error) => {
-          console.error('Error loading devices for user:', error);
-        }
-      });
-    this.loadSolarPanelsOfCurrentUser() // load solar panels of the current user
-      .pipe(
-        mergeMap(() => this.calculateTotalDailyPowerOutput())
-      )
-      .subscribe({
-        error: (error) => {
-          console.error('Error loading solar panels for user:', error);
+          console.error('Error loading data:', error);
         }
       });
   }
+
 
   loadSolarPanelsOfCurrentUser() {
     return this.api.getUserSolarPanels(this.userId)
@@ -236,37 +294,43 @@ export class DashboardComponent implements OnInit {
       );
   }
 
-  calculateTotalConsumption() { // This method calculates the total consumption and monthly cost of the user
-    return new Observable(() => {
-      const devices = this.userDevices;
-      if (!devices || devices.length === 0) {
-        this.userConsumption = 0;
-        this.userMonthlyCost = 0;
-        return 0;
-      }
+  calculateTotalConsumption() {
+    return this.calculateTotalDailyPowerOutput().pipe(
+      concatMap(() => {
+        const devices = this.userDevices;
+        if (!devices || devices.length === 0) {
+          this.userConsumption = 0;
+          this.userMonthlyCost = 0;
+          return of(0);
+        }
 
-      // the formula is Energy (kWh) = Power (W) × Time (h) / 1000
-      this.userConsumption = devices.reduce((total: number, device: { consumption: number; hoursUsed: number; }) => total + (device.consumption * device.hoursUsed / 1000), 0);
+        // the formula is Energy (kWh) = Power (W) × Time (h) / 1000
+        this.userConsumption = devices.reduce((total: number, device: { consumption: number; hoursUsed: number; }) => total + (device.consumption * device.hoursUsed / 1000), 0);
 
-      // the formula for monthly cost is Cost = Energy (kWh) × Price (per kWh)
-      if (this.userConsumption <= 100) {
-        this.userMonthlyCost = this.userConsumption * 0.68;
-      } else if (this.userConsumption <= 255) {
-        this.userMonthlyCost = 100 * 0.68 + (this.userConsumption - 100) * 0.8;
-      }
-      else if (this.userConsumption <= 300) {
-        this.userMonthlyCost = 100 * 0.68 + (255 - 100) * 0.8 + (this.userConsumption - 255) * 1.3;
-      }
-      else {
-        this.userMonthlyCost = 100 * 0.68 + (255 - 100) * 0.8 + (300 - 255) * 1.3 + (this.userConsumption - 300) * 1.3;
-      }
-      // for one month (30 days) the formula is Cost = Energy (kWh) × Price (per kWh) × 30
-      this.userMonthlyCost *= 30;
-      // round to 2 decimal places
-      this.userMonthlyCost = Math.round(this.userMonthlyCost * 100) / 100;
-      this.userConsumption = Math.round(this.userConsumption * 100) / 100;
-      return this.userConsumption;
-    });
+        // the formula for monthly cost is Cost = Energy (kWh) × Price (per kWh)
+        // the cost now should be updated according to the total power output of the solar panels
+        let userConsumptionLocal = this.userConsumption;
+        userConsumptionLocal -= this.totalDailyPowerOutput;
+        if (this.userConsumption <= 100) {
+          this.userMonthlyCost = userConsumptionLocal * 0.68;
+        } else if (this.userConsumption <= 255) {
+          this.userMonthlyCost = 100 * 0.68 + (userConsumptionLocal - 100) * 0.8;
+        }
+        else if (this.userConsumption <= 300) {
+          this.userMonthlyCost = 100 * 0.68 + (255 - 100) * 0.8 + (userConsumptionLocal - 255) * 1.3;
+        }
+        else {
+          this.userMonthlyCost = 100 * 0.68 + (255 - 100) * 0.8 + (300 - 255) * 1.3 + (userConsumptionLocal - 300) * 1.3;
+        }
+        // for one month (30 days) the formula is Cost = Energy (kWh) × Price (per kWh) × 30
+        this.userMonthlyCost *= 30;
+        // round to 2 decimal places
+        this.userMonthlyCost = ((Math.round(this.userMonthlyCost * 100) / 100) / 4.6).toFixed(2);
+        this.userConsumption = Math.round(this.userConsumption * 100) / 100;
+
+        return of(this.userConsumption);
+      })
+    );
   }
 
   loadDevicesOfCurrentUser() {
@@ -295,91 +359,116 @@ export class DashboardComponent implements OnInit {
         observer.error('User devices not loaded');
         return;
       }
-      // Create the chart that shows the most consumption devices (top 5)
+  
+      // Extract top 5 devices based on consumption
+      const topDevices = this.userDevices.slice(0, 5);
+  
+      // Prepare data for the chart
+      const chartData = {
+        labels: topDevices.map((device: { name: any; }) => device.name),
+        datasets: [{
+          label: 'Top 5 devices with the highest consumption (W)',
+          data: topDevices.map((device: { consumption: any; }) => device.consumption),
+          backgroundColor: 'rgba(255, 99, 132, 0.2)',
+          borderColor: 'rgba(255, 99, 132, 1)',
+          borderWidth: 1
+        }]
+      };
+  
+      // Create the chart with a bar chart type
       const ctxMostExpensive = document.getElementById('mostConsumptionExpensiveDevicesChart') as HTMLCanvasElement;
       const myChartMostExpensive = new Chart(ctxMostExpensive, {
-        type: 'line',
-        data: {
-          labels: this.userDevices.slice(0, 5).map((device: any) => device.name), // Assuming device has a name property
-          datasets: [{
-            label: 'Top 5 devices with the highest consumption (W)',
-            data: this.userDevices.slice(0, 5).map((device: any) => device.consumption),
-            backgroundColor: 'rgba(255, 99, 132, 0.2)', // Adjust bar color
-            borderColor: 'rgba(255, 99, 132, 1)', // Adjust border color
-            borderWidth: 1 // Adjust border width
-          }]
-        },
+        type: 'bar', // Use bar chart type instead of line
+        data: chartData,
         options: {
-          responsive: true, // Make the chart responsive
-          maintainAspectRatio: false, // Prevent the chart from maintaining aspect ratio
+          responsive: true,
+          maintainAspectRatio: false,
           scales: {
-            x: {
-              display: false
+            y: {
+              beginAtZero: true // Start y-axis at 0
             }
           }
         }
       });
-
+  
       // Notify that chart population is complete
       observer.next(myChartMostExpensive);
       observer.complete();
     });
   }
+  
+  
 
-  populateRegressionChart() { // This is the chart that shows the predicted consumption for the next month
+  populateRegressionChart() {
     return new Observable<any>(observer => {
       const devices = this.userDevices;
       if (!devices || devices.length === 0) {
-        // If devices are not loaded yet, wait for them
         observer.error('User devices not loaded');
         return;
       }
-
+  
       // Calculate the end date of the next month
       const today = new Date();
       const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
       const endDateOfNextMonth = new Date(nextMonth.getFullYear(), nextMonth.getMonth() + 1, 0);
-
+  
       // Filter devices based on their date added to consider only devices added before next month
       const devicesAddedBeforeNextMonth = devices.filter((device: any) => new Date(device.dateAdded) < endDateOfNextMonth);
-
+  
       // Prepare data for regression analysis
       const data = devicesAddedBeforeNextMonth.map((device: { hoursUsed: any; consumption: any; }) => [device.hoursUsed, device.consumption]);
-
+  
       // Perform linear regression
       const result = regression.linear(data, { precision: 10 });
       const gradient = result.equation[0];
       const yIntercept = result.equation[1];
-
+  
       // Predict consumption for each device for the next month using regression equation
       const predictions = devicesAddedBeforeNextMonth.map((device: any) => {
-        const totalHoursNextMonth = (new Date(nextMonth.getFullYear(), nextMonth.getMonth() + 1, 0)).getDate() * device.hoursUsed;
-        const predictedConsumptionInW = gradient * totalHoursNextMonth + yIntercept;
+        const predictedConsumptionInW = gradient * device.consumption + yIntercept;
         const predictedConsumptionInkWh = predictedConsumptionInW / 1000; // Convert to kWh
-
+  
         return {
           device,
           predictedConsumption: predictedConsumptionInkWh
         };
       });
-
+  
+      // Calculate historical consumption in kWh
+      const historicalConsumption = devicesAddedBeforeNextMonth.map((device: any) => {
+        return{ consumption: (device.consumption*device.hoursUsed*30) / 1000};// Convert to kWh
+      });
+  
       // Create the chart
       const ctx = document.getElementById('consumptionPredictionChart') as HTMLCanvasElement;
       const myChart = new Chart(ctx, {
         type: 'line',
         data: {
-          labels: predictions.map((prediction: any) => prediction.device.name), // Assuming device has a name property
-          datasets: [{
-            label: 'Predicted Consumption for Next Month (kWh)',
-            data: predictions.map((prediction: any) => prediction.predictedConsumption),
-            borderColor: 'rgba(75, 192, 192, 1)', // Adjust line color
-            borderWidth: 2, // Adjust line width
-            pointStyle: 'circle', // Use circle as point style
-            pointBackgroundColor: 'rgba(75, 192, 192, 1)', // Adjust point color
-            pointBorderColor: 'rgba(75, 192, 192, 1)', // Adjust point border color
-            pointRadius: 5, // Adjust point radius
-            pointHoverRadius: 7 // Adjust point hover radius
-          }]
+          labels: devicesAddedBeforeNextMonth.map((device: any) => device.name),
+          datasets: [
+            {
+              label: 'Current Consumption this Month (kWh)',
+              data: historicalConsumption.map((device: any) => device.consumption),
+              borderColor: 'rgba(153, 102, 255, 1)', // Adjust line color
+              borderWidth: 2, // Adjust line width
+              pointStyle: 'circle', // Use circle as point style
+              pointBackgroundColor: 'rgba(153, 102, 255, 1)', // Adjust point color
+              pointBorderColor: 'rgba(153, 102, 255, 1)', // Adjust point border color
+              pointRadius: 5, // Adjust point radius
+              pointHoverRadius: 7 // Adjust point hover radius
+            },
+            {
+              label: 'Predicted Consumption for Next Month (kWh)',
+              data: predictions.map((prediction: any) => prediction.predictedConsumption),
+              borderColor: 'rgba(75, 192, 192, 1)', // Adjust line color
+              borderWidth: 2, // Adjust line width
+              pointStyle: 'circle', // Use circle as point style
+              pointBackgroundColor: 'rgba(75, 192, 192, 1)', // Adjust point color
+              pointBorderColor: 'rgba(75, 192, 192, 1)', // Adjust point border color
+              pointRadius: 5, // Adjust point radius
+              pointHoverRadius: 7 // Adjust point hover radius
+            }
+          ]
         },
         options: {
           scales: {
@@ -392,12 +481,12 @@ export class DashboardComponent implements OnInit {
               }
             },
             x: {
-              display: false // Hide the x-axis labels
+              display: true // Show the x-axis labels
             }
           }
         }
       });
-
+  
       // Notify that chart population is complete
       observer.next(myChart);
       observer.complete();

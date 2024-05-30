@@ -32,13 +32,13 @@
                 </a>
             </li>
             <li>
-                <a href="#">
+                <a data-toggle="modal" data-target="#userSettingsModal">
                     <span class="icon"><i class="fa fa-cog" aria-hidden="true"></i></span>
                     <span class="title">Settings</span>
                 </a>
             </li>
             <li>
-                <a href="#">
+                <a class="logoutBtn" (click)="logout()">
                     <span class="icon"><i class="fa fa-sign-out" aria-hidden="true"></i></span>
                     <span class="title">Sign out</span>
                 </a>
@@ -50,6 +50,9 @@
             <div class="recentDevices">
                 <div class="cardHeader">
                     <h2>Your Solar Panels</h2>
+                </div>
+                <div class="col-md-4">
+                    <button (click)="openAddDeviceModal()" data-toggle="modal" data-target="#addSolarPanelModal" class="btn btn-primary">Add New Solar Panel</button>
                 </div>
                 <table>
                     <thead>
@@ -73,15 +76,24 @@
                 <pagination-controls (pageChange)="currentPage = $event"></pagination-controls>
             </div>
 
-            <div class="mt-4 ml-4 d-flex">
+            <div class="mt-4 d-flex text-center">
+                <div id="solarPanelsConsumptionChartDiv">
+                    <canvas id="solarPanelsConsumptionChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="addSolarPanelModal" tabindex="-1" role="dialog" aria-labelledby="addSolarPanelModalLabel" aria-hidden="true" [ngClass]="{'show': isAddDeviceModalOpen}">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Solar Panel</h5>
+            </div>
+            <div class="modal-body">
                 <form [formGroup]="addSolarPanelForm">
-                    <div class="row">
-                        <div class="col">
-                            <h4 class="pt-3 font-weight-bold">
-                                Add Solar Panel
-                            </h4>
-                        </div>
-                    </div>
                     <div class="row mt-3">
                         <div class="col-md-6">
                             <select class="form-control custom-select" id="deviceName" formControlName="name" placeholder="Select Solar Panel">
@@ -98,12 +110,38 @@
                             <input type="text" style="display:none;" class="form-control" formControlName="userId">
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <button (click)="addSolarPanel()" class="btn btn-primary form-group">Add Panel</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="closeAddDeviceModalBtn" type="button" class="btn btn-secondary" data-dismiss="modal" (click)="closeAddDeviceModal()">Close</button>
+                <button type="button" class="btn btn-primary" (click)="addSolarPanel()">Add Panel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="userSettingsModal" tabindex="-1" role="dialog" aria-labelledby="userSettingsModalLabel" aria-hidden="true" [ngClass]="{'show': isAddDeviceModalOpen}">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">User settings</h5>
+            </div>
+            <div class="modal-body">
+                <form [formGroup]="editUserForm">
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" placeholder="Enter your new password" formControlName="password">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" placeholder="Enter your new email" formControlName="email">
                     </div>
                 </form>
             </div>
-
+            <div class="modal-footer">
+                <button id="closeAddDeviceModalBtn" type="button" class="btn btn-secondary" data-dismiss="modal" (click)="closeAddDeviceModal()">Close</button>
+                <button type="button" class="btn btn-primary" (click)="editUserSettings()">Save</button>
+            </div>
         </div>
     </div>
 </div>

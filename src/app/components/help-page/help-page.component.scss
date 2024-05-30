@@ -157,15 +157,13 @@ h3 {
  
 .help-container {
   position: rela;
-  margin: 0 auto;
+  margin: 10 auto;
   padding: 20px;
   border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   position: absolute;
   width: calc(100% - 44px);
   left: 243px;
   min-height: 100vh;
-  background: linear-gradient(to top, #c9c9ff 60%, #6e6ef6 170%) no-repeat;
   transition: 0.5s;
 }
 
@@ -203,4 +201,32 @@ p {
   font-size: 1.1rem;
   line-height: 1.6;
   color: #777;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+.form-group input[type="text"],
+.form-group input[type="password"],
+.form-group input[type="email"] {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+.form-group input[type="submit"] {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
 }

@@ -133,6 +133,8 @@ export class AddDevicesComponent {
   public userDevices: any = [];
   public isUserProsumer: any = false;
 
+  editUserForm!: FormGroup;
+
   pagedDevices: any[] = []; // Devices for the current page
   currentPage: number = 1; // Current page number
   itemsPerPage: number = 10; // Number of items per page
@@ -264,6 +266,39 @@ export class AddDevicesComponent {
       observer.next(categoryChart);
       observer.complete();
     });
+  }
+  
+  isEditUserModalOpen: boolean = false;
+
+  // Method to open the modal
+  openEditUserModal() {
+    this.isEditUserModalOpen = true;
+  }
+
+  // Method to close the modal
+  closeEditUserModal() {
+    this.isEditUserModalOpen = false;
+  }
+
+  editUserSettings() {
+    this.editUserForm.patchValue({ id: this.userId });
+    this.apiService.editUser(this.editUserForm.value)
+    .subscribe({
+      next: (res: any) => {
+        this.toast.success({
+          detail: 'Success',
+          summary: 'User settings updated successfully!',
+          duration: 3000,
+        });
+      },
+      error: () => {
+        console.log("Error");
+      }
+    });
+  }
+
+  logout() {
+    this.authService.signOut();
   }
 
   getDeviceNames(): string[] {

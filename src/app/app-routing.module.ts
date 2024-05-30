@@ -18,7 +18,7 @@ const routes: Routes = [
   { path: 'add-devices', component: AddDevicesComponent, canActivate: [CanActivate] },
   { path: 'reset-password', component: ResetPasswordComponent },
   { path: 'help-page', component: HelpPageComponent },
-  { path: 'prosumer', component: ProsumerComponent, canActivate: [CanActivate] }
+  { path: 'prosumer', component: ProsumerComponent, canActivate: [CanActivate] },
 ];
 
 @NgModule({

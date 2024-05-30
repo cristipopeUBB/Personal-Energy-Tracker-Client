@@ -32,7 +32,7 @@
                 </a>
             </li>
             <li>
-                <a href="#">
+                <a data-toggle="modal" data-target="#userSettingsModal">
                     <span class="icon"><i class="fa fa-cog" aria-hidden="true"></i></span>
                     <span class="title">Settings</span>
                 </a>
@@ -74,17 +74,17 @@
             </div>
             <div class="card">
                 <div>
-                    <div class="numbers">208</div>
-                    <div class="cardName">TEST</div>
+                    <div class="numbers">{{dailyCostSaving}}$</div>
+                    <div class="cardName">Saved today</div>
                 </div>
                 <div class="iconBox">
-                    <i class="fa fa-comment" aria-hidden="true"></i>
+                    <i class="fa-solid fa-piggy-bank" aria-hidden="true"></i>
                 </div>
             </div>
             <div class="card">
                 <div>
                     <div class="numbers">${{userMonthlyCost}}</div>
-                    <div class="cardName">Energy bill cost</div>
+                    <div class="cardName">Predicted energy bill this month</div>
                 </div>
                 <div class="iconBox">
                     <i class="fa fa-usd" aria-hidden="true"></i>
@@ -175,6 +175,32 @@
             </div>
             <div class="chatIcon" (click)="toggleChat()">
                 <i class="fa fa-comments" aria-hidden="true"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="userSettingsModal" tabindex="-1" role="dialog" aria-labelledby="userSettingsModalLabel" aria-hidden="true" [ngClass]="{'show': isAddDeviceModalOpen}">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">User settings</h5>
+            </div>
+            <div class="modal-body">
+                <form [formGroup]="editUserForm">
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" placeholder="Enter your new password" formControlName="password">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" placeholder="Enter your new email" formControlName="email">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="closeAddDeviceModalBtn" type="button" class="btn btn-secondary" data-dismiss="modal" (click)="closeAddDeviceModal()">Close</button>
+                <button type="button" class="btn btn-primary" (click)="editUserSettings()">Save</button>
             </div>
         </div>
     </div>

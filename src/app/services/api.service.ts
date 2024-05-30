@@ -37,4 +37,8 @@ export class ApiService {
   getUserSolarPanels(userId: number) {
     return this.http.get<any>(`${this.solarPanelsUrl}get?userId=${userId}`);
   }
+
+  editUser(user: any) {
+    return this.http.put<any>(`${this.baseUrl}edit`, user);
+  }
 }
