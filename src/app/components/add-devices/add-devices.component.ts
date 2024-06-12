@@ -139,9 +139,17 @@ export class AddDevicesComponent {
   currentPage: number = 1; // Current page number
   itemsPerPage: number = 10; // Number of items per page
 
+  private chartInstance: Chart | null = null;
+
   constructor(private apiService: ApiService, private fb: FormBuilder, private userStoreService: UserStoreService,
     private authService: AuthService, private toast: NgToastService) {
     Chart.register(...registerables);
+    
+
+    this.editUserForm = this.fb.group({
+      password: ['', Validators.required],
+      email: ['', Validators.required],
+    });
   }
 
   ngOnInit() {
@@ -163,12 +171,12 @@ export class AddDevicesComponent {
         }
       });
 
-    this.addDeviceForm = this.fb.group({
-      name: ['', Validators.required],
-      consumption: ['', Validators.required],
-      hoursUsed: ['', Validators.required],
-      userId: ['', Validators.required]
-    });
+      this.addDeviceForm = this.fb.group({
+        name: ['', Validators.required],
+        consumption: ['', Validators.required],
+        hoursUsed: ['', Validators.required],
+        userId: ['', Validators.required]
+      });
 
     // Subscribe to value changes on the form control
     this.addDeviceForm.get('name')!.valueChanges.subscribe((selectedDevice: string) => {
@@ -203,6 +211,10 @@ export class AddDevicesComponent {
 
   initializeCategoryChart() {
     return new Observable<any>(observer => {
+      var chartExist = Chart.getChart("categoryChart"); // <canvas> id
+      if (chartExist != undefined) {
+        chartExist.destroy(); 
+      }
       // Aggregate consumption by categories
       const categoryConsumption: { [key: string]: number } = {};
       for (const device of this.userDevices) {
@@ -318,6 +330,13 @@ export class AddDevicesComponent {
             next: () => {
             }
           });
+
+          this.initializeCategoryChart().subscribe({
+            next: () => {
+              console.log('Category chart updated');
+            }
+          });
+
           this.toast.success({
             detail: 'Success',
             summary: 'Device deleted successfully!',
@@ -396,6 +415,12 @@ export class AddDevicesComponent {
               document.getElementById('closeAddDeviceModalBtn')?.click(); // close the modal
             }
           });
+
+          this.initializeCategoryChart().subscribe({
+            next: () => {
+              console.log('Category chart updated');
+            }
+          })
           
           this.toast.success({
             detail: 'Success',

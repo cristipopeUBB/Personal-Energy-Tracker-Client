@@ -151,8 +151,14 @@ export class ProsumerComponent {
           //reset the table data
           this.loadSolarPanelsOfCurrentUser().subscribe({
             next: () => {
+              this.initializeSolarPanelsConsumptionChart().subscribe({
+                next: () => {
+                  console.log('Solar Panel chart updated');
+                }
+              });
             }
           });
+
           this.toast.success({
             detail: 'Success',
             summary: 'Solar panel deleted successfully!',
@@ -168,6 +174,11 @@ export class ProsumerComponent {
   initializeSolarPanelsConsumptionChart() {
 
     return new Observable<any>(observer => {
+
+      var chartExist = Chart.getChart("solarPanelsConsumptionChart"); // <canvas> id
+      if (chartExist != undefined) {
+        chartExist.destroy(); 
+      }
 
       // Formula for Solar Panel Power Output
       // Daily watt hours = Solar panel power * 6.06(hours of daylight in Romania) * 0.85(average efficiency)
@@ -246,8 +257,14 @@ export class ProsumerComponent {
               //reset the form
               document.getElementById('closeAddDeviceModalBtn')?.click(); // close the modal
               this.addSolarPanelForm.reset();
+              this.initializeSolarPanelsConsumptionChart().subscribe({
+                next: () => {
+                  console.log('Solar Panel chart updated');
+                }
+              });
             }
           });
+
           this.toast.success({
             detail: 'Success',
             summary: 'Solar panel added successfully!',

@@ -54,6 +54,11 @@ export class DashboardComponent implements OnInit {
     private authService: AuthService, private openAiService: OpenAiService, private toast: NgToastService,
     private formBuilder: FormBuilder) {
     Chart.register(...registerables);
+
+    this.editUserForm = this.formBuilder.group({
+      password: ['', Validators.required],
+      email: ['', Validators.required],
+    });
   }
 
   async ngOnInit() {
